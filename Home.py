@@ -1,5 +1,7 @@
+import os
 import webbrowser
 import streamlit as st
+from dotenv import load_dotenv
 from functions.connect import *
 from functions.collect_data import *
 
@@ -7,6 +9,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     layout="centered"
 )
+
+load_dotenv()
 
 def landing_page(data_collected):
 
@@ -17,12 +21,12 @@ def landing_page(data_collected):
 
     client_id = st.text_input(
         "Enter Strava Client ID",
-        "93139"
+        os.getenv('client_id')
     )
 
     client_secret = st.text_input(
         "Enter Strava Client Secret",
-        "dbd936b625c579396f069fb928b337a618b7212c"
+        os.getenv('client_secret')
     )
 
     clicked = st.button('Log In to Strava')
