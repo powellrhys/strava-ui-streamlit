@@ -2,7 +2,7 @@ name: Build & Publish Container
 
 on: [push]
 jobs:
-  Publish-Container:
+  PublishContainer:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,7 +12,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build {{ github.repository.name }} Docker image
+      - name: Build ${{ github.repository.name }} Docker image
         run: |
               echo ${{ github.actor }}
               echo ${{ secrets.GITHUB_TOKEN }}
