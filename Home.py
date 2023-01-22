@@ -20,29 +20,33 @@ def landing_page(data_collected):
         activity_data = st.session_state['activity_data']
 
     client_id = st.text_input(
-        "Enter Strava Client ID",
-        os.getenv('client_id')
-    )
+        label="Enter Strava Client ID",
+        placeholder="Enter Client ID",
+        value=os.getenv('client_id')
+        )
 
     client_secret = st.text_input(
-        "Enter Strava Client Secret",
-        os.getenv('client_secret')
+        label="Enter Strava Client Secret",
+        placeholder="Enter Client Secret",
+        value=os.getenv('client_secret')
     )
 
-    clicked = st.button('Log In to Strava')
+    redirect_uri = 'http://localhost:8502/'
+    request_url = authorization(client_id, redirect_uri)
+
+    st.markdown(
+        f'''
+        <a href='{request_url}'><button>Log In to Strava</button></a>
+        ''',
+        unsafe_allow_html=True
+        )
 
     url_code = st.text_input(
-    "Provide  Access Token from url:"
+        label="Provide  Access Token from url:",
+        placeholder="Value found from redirect url code"
     )
 
     fetch_data = st.button('Retrieve Strava Data')
-
-    if clicked:
-
-        redirect_uri = 'http://localhost/'
-        request_url = authorization(client_id, redirect_uri)
-        webbrowser.open(request_url)
-
 
     if fetch_data:
 
