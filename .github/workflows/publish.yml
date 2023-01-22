@@ -2,7 +2,7 @@ name: publish
 
 on: [push]
 jobs:
-  publish-hello-docker-image:
+  Publish-Container:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -14,5 +14,5 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the hello-docker Docker image
         run: |
-              docker build . --tag ghcr.io/${{ github.actor }}/strava-api:latest
-              docker push ghcr.io/${{ github.actor }}/strava-api:latest
+              docker build . --tag ghcr.io/powellrhys/strava-api:latest
+              docker push ghcr.io/powellrhys/strava-api:latest
