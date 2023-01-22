@@ -14,5 +14,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the hello-docker Docker image
         run: |
+              echo ${{ github.actor }}
+              echo ${{ secrets.GITHUB_TOKEN }}
               docker build . --tag ghcr.io/powellrhys/strava-api:latest
               docker push ghcr.io/powellrhys/strava-api:latest
