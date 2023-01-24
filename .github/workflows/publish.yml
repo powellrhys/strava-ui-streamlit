@@ -1,9 +1,6 @@
 name: Build & Publish Container
 
-on:
-  push:
-    branches: main
-  workflow_dispatch:
+on: [push]
 
 env:
   REGISTRY: ghcr.io
