@@ -32,7 +32,7 @@ jobs:
       #     docker push $REGISTRY/$IMAGE_NAME:latest
 
       - name: Output Run ID
-        run: echo ${{ vars.PACKAGE_VERSION }}
+        run: ${{ vars.PACKAGE_VERSION }} = 1.2
 
 
       # # Build and push docker image
