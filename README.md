@@ -8,8 +8,14 @@ Iteration 1.0 currently does not support container deployment and therefore can 
 
 `streamlit run Home.py`
 
-Upon running the command, navigate to port 8501 within your browser : `https://http://localhost:8501/`. On the landing page, enter an athlete's API `client_id` and `client_secret` before clicking the log in button. 
+Upon running the command, navigate to port 8501 within your browser : 
 
-Upon re-direction, login to your strava account and copy and paste the `code` paramater fromt he re-directed url (this is your `access_token`). Proceed to enter this value back into the landing page before retrieving your athlete's data. 
+`https://http://localhost:8501/`. 
+
+Once on the landing page, enter an athlete's API `client_id` and `client_secret` before clicking the log in button. Information on how to retrieve these values can be found [here](https://developers.strava.com/docs/getting-started/).
+
+Upon browser re-direction, login to your strava account and copy and paste the `code` paramater from the re-directed url (this is your `access_token`). 
+
+Proceed to enter this value back into the landing page to retrieve your athlete's data. 
 
 Once the data has been downloaded, navigate to the second tab to view your athlete's strava heatmap. 
