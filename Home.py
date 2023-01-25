@@ -31,22 +31,20 @@ def landing_page(data_collected):
         value=os.getenv('client_secret')
     )
 
-    redirect_uri = 'http://localhost:8502/'
-    request_url = authorization(client_id, redirect_uri)
-
-    st.markdown(
-        f'''
-        <a href='{request_url}'><button>Log In to Strava</button></a>
-        ''',
-        unsafe_allow_html=True
-        )
+    clicked = st.button('Log In to Strava')
 
     url_code = st.text_input(
-        label="Provide  Access Token from url:",
-        placeholder="Value found from redirect url code"
+    "Provide  Access Token from url:"
     )
 
     fetch_data = st.button('Retrieve Strava Data')
+
+    if clicked:
+
+        redirect_uri = 'http://localhost/'
+        request_url = authorization(client_id, redirect_uri)
+        webbrowser.open(request_url)
+
 
     if fetch_data:
 
