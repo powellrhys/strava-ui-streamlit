@@ -1,4 +1,4 @@
-# strava-api
+# strava-ui-streamlit
 
 The following reposiotry contains iteration 1.0 of leveraging the [strava-api](https://www.bing.com/search?q=strava+api&cvid=a5a113b1252641b58bd7edc0c46fb8e3&aqs=edge..69i57j0j69i59j0l3j69i60l3.3591j0j1&pglt=43&FORM=ANNTA1&PC=DCTS) to map athlete data. 
 
