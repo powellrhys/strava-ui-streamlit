@@ -4,9 +4,6 @@ import webbrowser
 import uvicorn
 import os
 
-from functions.server import \
-    configure_server
-
 from functions.authentication import \
     exchange_code_for_token, \
     get_authorization_url
@@ -16,24 +13,36 @@ from functions.collect_data import \
     collect_all_activity_data, \
     export_activity_data
 
-load_dotenv()
+from functions.server import \
+    configure_server
 
+# Load environmental variables
+load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 REDIRECT_URI = os.getenv('REDIRECT_URI')
 
+# Configure backend API
 app = configure_server()
 
+# Define callback endpoint
 @app.get('/callback')
 def callback(req: Request):
+
+    # Fetch code from callback url
     code = req.query_params['code']
     if code:
+
+        # Fetch token from code
         token_data = exchange_code_for_token(CLIENT_ID, CLIENT_SECRET, code)
+
         if token_data:
 
+            # Collect activity data
             data = collect_all_activity_data(access_token=token_data['access_token'],
                                              per_page=200)
 
+            # Export data as csv to local file store
             export_activity_data(data=data,
                                  output_directory='data',
                                  output_filename='activity_data.csv')

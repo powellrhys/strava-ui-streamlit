@@ -3,7 +3,11 @@ from fastapi import FastAPI
 
 
 def configure_server():
-
+    '''
+    Input: None
+    Output: Fast API server
+    Function to configure FAST API server
+    '''
     app = FastAPI()
 
     app.add_middleware(
