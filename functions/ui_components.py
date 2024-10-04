@@ -42,7 +42,7 @@ def homepage_metrics(activity_data: pd.DataFrame,
                 'distance': filtered_df['distance'].sum()/1000
             }
 
-            # Append yearly data to dictionary 
+            # Append yearly data to dictionary
             data[type] = yearly_data
 
     # Define columns
