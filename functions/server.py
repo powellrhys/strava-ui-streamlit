@@ -8,8 +8,10 @@ def configure_server():
     Output: Fast API server
     Function to configure FAST API server
     '''
+    # Set up FastApi Object
     app = FastAPI()
 
+    # Apply required middleware
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
