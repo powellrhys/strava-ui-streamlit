@@ -77,3 +77,18 @@ def export_activity_data(data: list,
 
     # Write dataframe to blob storage
     df.to_csv(f'{output_directory}/{output_filename}')
+
+
+def read_activity_data() -> pd.DataFrame:
+    '''
+    Input: None
+    Output: Activity Data Dataframe
+    Function to read activity data dataframe from local file store
+    '''
+    # Read activity data from local file store
+    df = pd.read_csv('data/activity_data.csv')
+
+    # Cast date as pandas datatime object
+    df['start_date'] = pd.to_datetime(df['start_date'])
+
+    return df

@@ -1,67 +1,28 @@
-import os
-import webbrowser
 import streamlit as st
-from dotenv import load_dotenv
-from functions.connect import *
-from functions.collect_data import *
 
-st.set_page_config(
-    initial_sidebar_state="expanded",
-    layout="centered"
-)
+from functions.ui_components import \
+    configure_page_config, \
+    homepage_metrics
 
-load_dotenv()
+from functions.collect_data import \
+    read_activity_data
 
-def landing_page(data_collected):
+from functions.variables import \
+    Variables
 
-    if data_collected is False:
-        activity_data = []
-    else:
-        activity_data = st.session_state['activity_data']
+# Setup page config
+configure_page_config()
 
-    client_id = st.text_input(
-        label="Enter Strava Client ID",
-        placeholder="Enter Client ID",
-        value=os.getenv('client_id')
-        )
+# Collect codebase variables
+vars = Variables
 
-    client_secret = st.text_input(
-        label="Enter Strava Client Secret",
-        placeholder="Enter Client Secret",
-        value=os.getenv('client_secret')
-    )
+# Read in activity data
+activity_data = read_activity_data()
 
-    clicked = st.button('Log In to Strava')
+# Define page title and header
+st.title('STRAVA DASHBOARD')
+st.header(f'Yearly distance stats to date ({vars.current_year})')
 
-    url_code = st.text_input(
-    "Provide  Access Token from url:"
-    )
-
-    fetch_data = st.button('Retrieve Strava Data')
-
-    if clicked:
-
-        redirect_uri = 'http://localhost/'
-        request_url = authorization(client_id, redirect_uri)
-        webbrowser.open(request_url)
-
-
-    if fetch_data:
-
-        with st.spinner('Collecting Data...'):
-            access_token = get_access_token(client_id, client_secret, url_code)
-
-            for page_number in range(1, 11):
-                page_data = get_data(access_token, page=page_number)
-                if page_data == []:
-                    break
-                activity_data = activity_data + page_data
-
-        st.success("All Activity Data Collected")
-
-    return activity_data
-
-if 'activity_data' not in st.session_state:
-    st.session_state.activity_data = landing_page(data_collected=False)
-else:
-    st.session_state.activity_data = landing_page(data_collected=True)
+# Render homepage metrics ui component
+homepage_metrics(activity_data=activity_data,
+                 vars=vars)
