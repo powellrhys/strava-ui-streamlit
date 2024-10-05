@@ -1,7 +1,5 @@
-from dotenv import load_dotenv
 from fastapi import Request
 import uvicorn
-import os
 
 from functions.authentication import \
     exchange_code_for_token
@@ -14,15 +12,15 @@ from functions.server import \
     export_data_metadata, \
     configure_server
 
-# Load environmental variables
-load_dotenv()
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+from functions.variables import \
+    Variables
 
+# Load environmental variables
+vars = Variables()
 # Configure backend API
 app = configure_server()
 
-# Define callback endpoint
+# Define Root Endpoint
 @app.get('/')
 def home():
     return {'Server Running': True}
@@ -36,7 +34,9 @@ def callback(req: Request):
     if code:
 
         # Fetch token from code
-        token_data = exchange_code_for_token(CLIENT_ID, CLIENT_SECRET, code)
+        token_data = exchange_code_for_token(vars.client_id,
+                                             vars.client_secret,
+                                             code)
 
         if token_data:
 
