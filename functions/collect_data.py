@@ -1,5 +1,7 @@
 import pandas as pd
 import requests
+import shutil
+import json
 
 def get_activity_data(access_token: str,
                       per_page: int = 200,
@@ -48,6 +50,7 @@ def collect_all_activity_data(access_token: str,
 
     return data
 
+
 def export_activity_data(data: list,
                          output_directory: str,
                          output_filename: str):
@@ -78,6 +81,8 @@ def export_activity_data(data: list,
     # Write dataframe to blob storage
     df.to_csv(f'{output_directory}/{output_filename}')
 
+    shutil.move(f'{output_directory}/{output_filename}', 'data/activity_data.csv')
+
 
 def read_activity_data() -> pd.DataFrame:
     '''
@@ -86,9 +91,18 @@ def read_activity_data() -> pd.DataFrame:
     Function to read activity data dataframe from local file store
     '''
     # Read activity data from local file store
-    df = pd.read_csv('data/activity_data.csv')
+    with open('data/activity_data.csv', 'r', encoding='utf-8') as file:
+        df = pd.read_csv(file)
 
     # Cast date as pandas datatime object
     df['start_date'] = pd.to_datetime(df['start_date'])
 
     return df
+
+
+def read_data_metadata() -> dict:
+
+    with open('data/last_updated.json') as f:
+        data = json.load(f)
+
+    return data

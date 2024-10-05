@@ -1,29 +1,31 @@
 from dotenv import load_dotenv
 from fastapi import Request
-import webbrowser
 import uvicorn
 import os
 
 from functions.authentication import \
-    exchange_code_for_token, \
-    get_authorization_url
-
+    exchange_code_for_token
 
 from functions.collect_data import \
     collect_all_activity_data, \
     export_activity_data
 
 from functions.server import \
+    export_data_metadata, \
     configure_server
 
 # Load environmental variables
 load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-REDIRECT_URI = os.getenv('REDIRECT_URI')
 
 # Configure backend API
 app = configure_server()
+
+# Define callback endpoint
+@app.get('/')
+def home():
+    return {'Server Running': True}
 
 # Define callback endpoint
 @app.get('/callback')
@@ -45,7 +47,10 @@ def callback(req: Request):
             # Export data as csv to local file store
             export_activity_data(data=data,
                                  output_directory='data',
-                                 output_filename='activity_data.csv')
+                                 output_filename='temp_activity_data.csv')
+
+            # Update last updated metadata
+            export_data_metadata()
 
             return 'All Activity Data Collected'
 
@@ -56,10 +61,6 @@ def callback(req: Request):
 
 
 if __name__ == '__main__':
-
-    # Open the authorization URL in the default browser
-    auth_url = get_authorization_url(CLIENT_ID, REDIRECT_URI)
-    webbrowser.open(auth_url)
 
     # Run Backend Server
     uvicorn.run(app, host="0.0.0.0", port=5000)
