@@ -68,4 +68,4 @@ if update:
         st.session_state['activity_data'] = read_activity_data()
 
         # Reload page
-        st.experimental_rerun()
+        st.rerun()
