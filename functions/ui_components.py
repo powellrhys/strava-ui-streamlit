@@ -1,5 +1,6 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import warnings
 
 from functions.variables import Variables
 
@@ -15,6 +16,9 @@ def configure_page_config(initial_sidebar_state: str = "expanded",
         initial_sidebar_state=initial_sidebar_state,
         layout=layout
     )
+
+    # Ignore all warnings
+    warnings.filterwarnings("ignore")
 
 
 def homepage_metrics(activity_data: pd.DataFrame,
