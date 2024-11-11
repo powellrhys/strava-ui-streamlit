@@ -22,42 +22,53 @@ end_date = datetime(datetime.now().year, 12, 31)
 
 # Create a slider with two datetime values
 date_range = st.sidebar.slider(
-    "Select a range of dates:",
+    label="Select a range of dates:",
     min_value=start_date,
     max_value=end_date,
     value=(start_date, end_date),
     format="MM/YYYY"
 )
 
+# Activity multiselect input
 selected_activity_type = st.sidebar.multiselect(label='Activity Type',
                                                 options=all_activity_types,
                                                 default=['Run'])
 
+# Chart type radio input
 chart_type = st.sidebar.radio(label='Plot Type',
                               options=['Bar', 'Line'])
 
+# Granularity radio input
 plot_resolution = st.sidebar.radio(label='Plot Resolution',
                                    options=['Yearly', 'Monthly'])
 
+# Map granularity input to chart resolution
 if plot_resolution == 'Yearly':
     resolution = 'Y'
 elif plot_resolution == 'Monthly':
     resolution = 'M'
 
+# Group data by specified granularity
 grouped_df = activity_data.groupby([activity_data['start_date'].dt.to_period(resolution), 'type']).sum().reset_index()
 
+# Filter by activity type
 grouped_df = grouped_df[grouped_df['type'].isin(selected_activity_type)]
 
 # Convert 'date' back to datetime for plotting purposes
 grouped_df['start_date'] = grouped_df['start_date'].dt.to_timestamp()
 
+# Filter by date range
 grouped_df = grouped_df[(grouped_df['start_date'] >= date_range[0]) & (grouped_df['start_date'] <= date_range[1])]
 
-# Plotting using Plotly Express
-fi = chart_func = getattr(px, chart_type.lower())
+# Define figure attributes
+chart_func = getattr(px, chart_type.lower())
 
-fig = chart_func(grouped_df, x='start_date', y='distance', color='type',
+# Generate figure
+fig = chart_func(grouped_df, x='start_date',
+                 y='distance',
+                 color='type',
                  labels={'start_date': 'Year', 'distance': 'Total Distance'},
                  title='Yearly Total Distance by Type')
 
+# Illustrate figure
 st.plotly_chart(fig)
