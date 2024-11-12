@@ -34,6 +34,14 @@ selected_activity_type = st.sidebar.multiselect(label='Activity Type',
                                                 options=all_activity_types,
                                                 default=['Run'])
 
+# Metric select box
+metric = st.sidebar.selectbox(label='Metric',
+                              options=['Distance',
+                                       'Count',
+                                       'Kudos Count',
+                                       'Total Elevation Gain',
+                                       'Moving Time'])
+
 # Chart type radio input
 chart_type = st.sidebar.radio(label='Plot Type',
                               options=['Bar', 'Line'])
@@ -48,8 +56,16 @@ if plot_resolution == 'Yearly':
 elif plot_resolution == 'Monthly':
     resolution = 'M'
 
-# Group data by specified granularity
-grouped_df = activity_data.groupby([activity_data['start_date'].dt.to_period(resolution), 'type']).sum().reset_index()
+if metric == 'Count':
+    grouped_df = activity_data \
+        .groupby([activity_data['start_date'].dt.to_period(resolution), 'type'])['type'] \
+        .count().reset_index(name='count')
+
+# Aggregate data by distance
+else:
+    grouped_df = activity_data \
+        .groupby([activity_data['start_date'].dt.to_period(resolution), 'type']) \
+        .sum().reset_index()
 
 # Filter by activity type
 grouped_df = grouped_df[grouped_df['type'].isin(selected_activity_type)]
@@ -64,11 +80,14 @@ grouped_df = grouped_df[(grouped_df['start_date'] >= date_range[0]) & (grouped_d
 chart_func = getattr(px, chart_type.lower())
 
 # Generate figure
-fig = chart_func(grouped_df, x='start_date',
-                 y='distance',
+fig = chart_func(grouped_df,
+                 x='start_date',
+                 y=metric.lower().replace(' ', '_'),
                  color='type',
-                 labels={'start_date': 'Year', 'distance': 'Total Distance'},
-                 title='Yearly Total Distance by Type')
+                 labels={'start_date': 'Date',
+                         'type': 'Activity Type',
+                         metric.lower().replace(' ', '_'): metric},
+                 title=f'{plot_resolution} {metric} by Type')
 
 # Illustrate figure
 st.plotly_chart(fig)

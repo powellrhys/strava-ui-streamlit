@@ -14,7 +14,8 @@ def configure_page_config(initial_sidebar_state: str = "expanded",
     # Set page config
     st.set_page_config(
         initial_sidebar_state=initial_sidebar_state,
-        layout=layout
+        layout=layout,
+        page_icon=':running_shirt_with_sash:'
     )
 
     # Ignore all warnings
