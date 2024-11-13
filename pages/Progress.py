@@ -13,6 +13,11 @@ configure_page_config()
 
 # Read in activity data
 activity_data = read_activity_data()
+
+# Convert distance from meters to kilometers
+activity_data['distance'] = activity_data['distance'] / 1000
+
+# Collect a list of unique activity types
 all_activity_types = activity_data['type'].unique().tolist()
 
 st.title('Progress')
