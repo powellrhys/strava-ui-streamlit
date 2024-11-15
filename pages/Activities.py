@@ -1,5 +1,4 @@
 import streamlit as st
-from datetime import datetime
 import pandas as pd
 
 from functions.ui_components import \
@@ -8,57 +7,77 @@ from functions.ui_components import \
 from functions.collect_data import \
     read_activity_data
 
+from functions.variables import \
+    Variables
+
 # Setup page config
 configure_page_config()
 
-start_date = datetime(2016, 1, 1)
-end_date = datetime(datetime.now().year, 12, 31)
+# Load page variables
+vars = Variables()
 
 # Read in activity data
 activity_data = read_activity_data()
+
+# Drop index when reading in data from csv
 activity_data = activity_data.drop([activity_data.columns[0]], axis=1)
 
 # Collect a list of unique activity types
 all_activity_types = activity_data['type'].unique().tolist()
 
+# Define page title
 st.title('Activity Overview')
 
 # Create a slider with two datetime values
 date_range = st.sidebar.slider(
     label="Select a range of dates:",
-    min_value=start_date,
-    max_value=end_date,
-    value=(start_date, end_date),
+    min_value=vars.first_activity_date,
+    max_value=vars.current_date,
+    value=(vars.first_activity_date, vars.current_date),
     format="MM/YYYY"
 )
 
+# Create multiselect object for activity type
 selected_activity_types = st.sidebar \
     .multiselect(label='Activity',
                  options=all_activity_types,
                  default=['Run'])
 
+
+# Filter data by activity type
 activity_data = activity_data[activity_data['type'].isin(selected_activity_types)]
 
-# # Convert 'date' back to datetime for plotting purposes
-# activity_data['start_date'] = activity_data['start_date'].dt.to_timestamp()
+# Filter by date range
+activity_data['start_date'] = activity_data['start_date'].dt.tz_localize(None)
+activity_data = activity_data[
+    (activity_data['start_date'] >= date_range[0]) & (activity_data['start_date'] <= date_range[1])]
 
-for column in activity_data.columns:
-    activity_data = activity_data \
-        .rename(columns={
-            column: column.replace('_', ' ').upper()
-        })
+# Convert distance from meters to kilometers
+activity_data['distance'] = (activity_data['distance'] / 1000).round(2)
 
-activity_data['DATE'] = pd.to_datetime(activity_data['START DATE']).dt.date
+# Convert start date column in date format (remove the time element)
+activity_data['start_date'] = pd.to_datetime(activity_data['start_date']).dt.date
 
-activity_data = activity_data[['NAME',
-                               'DISTANCE',
-                               'MOVING TIME',
-                               'TOTAL ELEVATION GAIN',
-                               'TYPE',
-                               'DATE',
-                               'KUDOS COUNT'
-                               ]]
+# Convert moving time data to hh:mm format
+activity_data['moving_time'] = activity_data['moving_time'] \
+    .apply(lambda x: f"{x // 3600}:{(x % 3600) // 60:02}")
 
+# Column Mapping
+column_headers_map = {
+    'name': 'Name',
+    'distance': 'Distance (km)',
+    'moving_time': 'Moving Time (hh:mm)',
+    'total_elevation_gain': 'Elevation Gain (m)',
+    'type': 'Activity Type',
+    'start_date': 'Date',
+    'kudos_count': 'Kudos Count'
+}
+
+# Rename and select dataframe columns
+activity_data = activity_data.rename(columns=column_headers_map)
+activity_data = activity_data[list(column_headers_map.values())]
+
+# Display data in dataframe
 st.dataframe(data=activity_data,
              use_container_width=True,
              hide_index=True)
