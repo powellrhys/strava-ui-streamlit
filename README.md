@@ -3,24 +3,24 @@
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 
-The strava-ui-streamlit repository is a python project created to illustrate personal athlete data from [Strava](https://www.strava.com/). Visuals are generated using a combination of [folium](https://python-visualization.github.io/folium/) and [plotly](https://plotly.com/python/) and are rendered using [streamlit](https://streamlit.io/). Data is collected using the [Strava Developers API](https://developers.strava.com/docs/reference/) and is returned to the user using a FastAPI web server. 
+The strava-ui-streamlit repository is a python project created to illustrate personal athlete data from [Strava](https://www.strava.com/). Visuals are generated using a combination of [folium](https://python-visualization.github.io/folium/) and [plotly](https://plotly.com/python/) and are rendered using [streamlit](https://streamlit.io/). Data is collected using the [Strava Developers APIs](https://developers.strava.com/docs/reference/) and is returned to the user using a FastAPI web server. 
 
-In its current state, the project is only able to run locally. 
+In its current state, the project is only able to run locally with data being stored in a localy csv file. 
 
 ### Prerequisites
 
-To successfully run this project locally the following conditions must be addressed:
+To successfully run this project locally the following conditions must be met:
 
 - Ensure all python requirements are installed. This can be done by running `pip install -r requirements.txt`
 - Make sure your Strava account supports an API application. More information on how to configure this can be found [here](https://developers.strava.com/).
-- Once your Strava account has an API application, make sure you have a local environemtnal variables (.env) file. In it should be the following variables:
+- Once your Strava account has an API application, make sure you have a local environmental variables (.env) file. In it should be the following variables:
     - `CLIENT_ID` - available from your API application dashboard page
     - `CLIENT_SECRET` - available from your API application dashboard page
     - `REDIRECT_URI` - should be `'http://localhost:5000/callback'` when running the project locally
 
 ### Running the Project
 
-Data is collected via an input button on the landing page. Therefore, to first collect data the frontend must be launched. This can be done by running the following command from the root directory of the project.
+Data is collected via an input button on the landing page. Therefore, to first collect data, the frontend must be launched. This can be done by running the following command from the root directory of the project.
 
 `streamlit run Home.py`
 
@@ -57,7 +57,7 @@ Now all requirements have been met, navigate to port 8501 within your browser :
 
 In its current state the project has 4 pages:
 
-- Home - An overview of yearly stats in comparison to the previous year
+- Home - An overview of yearly stats. The activity types illustrated can be edited to meet your requirements
 - Activities - The data collected displayed in tabular format
 - Heatmap - A control panel enabling the user to customize their activity heatmap
 - Progress - Visualisations of activity progress over the years
