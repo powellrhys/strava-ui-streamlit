@@ -1,21 +1,63 @@
 # strava-ui-streamlit
 
-The following reposiotry contains iteration 1.0 of a strava athlete heatmap generator which utilises the [strava-api](https://www.bing.com/search?q=strava+api&cvid=a5a113b1252641b58bd7edc0c46fb8e3&aqs=edge..69i57j0j69i59j0l3j69i60l3.3591j0j1&pglt=43&FORM=ANNTA1&PC=DCTS).
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 
-Visuals were generated using [folium](https://python-visualization.github.io/folium/) and rendered using [streamlit](https://streamlit.io/).
+The strava-ui-streamlit repository is a python project created to illustrate personal athlete data from [Strava](https://www.strava.com/). Visuals are generated using a combination of [folium](https://python-visualization.github.io/folium/) and [plotly](https://plotly.com/python/) and are rendered using [streamlit](https://streamlit.io/). Data is collected using the [Strava Developers API](https://developers.strava.com/docs/reference/) and is returned to the user using a FastAPI web server. 
 
-Iteration 1.0 currently does not support container deployment and therefore can only be run locally at this point. The streamlit frontend may be initialised via the following command:
+In its current state, the project is only able to run locally. 
+
+### Prerequisites
+
+To successfully run this project locally the following conditions must be addressed:
+
+- Ensure all python requirements are installed. This can be done by running `pip install -r requirements.txt`
+- Make sure your Strava account supports an API application. More information on how to configure this can be found [here](https://developers.strava.com/).
+- Once your Strava account has an API application, make sure you have a local environemtnal variables (.env) file. In it should be the following variables:
+    - `CLIENT_ID` - available from your API application dashboard page
+    - `CLIENT_SECRET` - available from your API application dashboard page
+    - `REDIRECT_URI` - should be `'http://localhost:5000/callback'` when running the project locally
+
+### Running the Project
+
+Data is collected via an input button on the landing page. Therefore, to first collect data the frontend must be launched. This can be done by running the following command from the root directory of the project.
 
 `streamlit run Home.py`
 
-Upon running the command, navigate to port 8501 within your browser : 
+Before data can be collected the backend server must also be in operation. This can be done by utilising uvicorn. For those using vscode as their IDE, this can be done using the debugger. An example launch.json file can be seen below:
+
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run Uvicorn",
+        "type": "python",
+        "request": "launch",
+        "module": "uvicorn",
+        "args": [
+          "backend.main:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "5000",
+          "--reload"
+        ],
+        "jinja": true
+      }
+    ]
+  }
+```
+
+Now all requirements have been met, navigate to port 8501 within your browser : 
 
 `https://http://localhost:8501/`. 
 
-Once on the landing page, enter an athlete's API `client_id` and `client_secret` before clicking the log in button. Information on how to retrieve these values can be found [here](https://developers.strava.com/docs/getting-started/).
+### Project Overview
 
-Upon being redirected, login to your strava account and copy and paste the `code` paramater from the re-directed url (this is your `access_token`). 
+In its current state the project has 4 pages:
 
-Proceed to enter this value back into the landing page to retrieve your athlete's data. 
-
-Once the data has been downloaded, navigate to the second tab to view your athlete's strava heatmap. 
+- Home - An overview of yearly stats in comparison to the previous year
+- Activities - The data collected displayed in tabular format
+- Heatmap - A control panel enabling the user to customize their activity heatmap
+- Progress - Visualisations of activity progress over the years
