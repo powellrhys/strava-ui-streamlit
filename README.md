@@ -51,7 +51,7 @@ Before data can be collected the backend server must also be in operation. This 
 
 Now all requirements have been met, navigate to port 8501 within your browser : 
 
-`https://http://localhost:8501/`. 
+`https://http://localhost:8501/`
 
 ### Project Overview
 
