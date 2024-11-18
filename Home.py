@@ -4,7 +4,8 @@ import os
 
 from functions.ui_components import \
     configure_page_config, \
-    homepage_metrics
+    homepage_metrics, \
+    login_page
 
 from functions.collect_data import \
     read_activity_data, \
@@ -30,42 +31,49 @@ if 'activity_data' not in st.session_state:
 if st.session_state.activity_data is None:
     st.session_state['activity_data'] = read_activity_data()
 
-# Define page title and header
-st.title('STRAVA DASHBOARD')
-st.header(f'Yearly distance stats to date ({vars.current_year})')
+if not st.session_state['logged_in']:
 
-# Render homepage metrics ui component
-homepage_metrics(activity_data=st.session_state['activity_data'],
-                 vars=vars)
+    # Render login component
+    login_page()
 
-# Define second page header
-st.header('Status of Data')
+else:
 
-# Write out when data was last updated
-last_updated = read_data_metadata()['last_updated']
-st.write(f'**Data last updated:** {last_updated}')
+    # Define page title and header
+    st.title('STRAVA DASHBOARD')
+    st.header(f'Yearly distance stats to date ({vars.current_year})')
 
-# Update Data Button
-update = st.button('Update Data')
+    # Render homepage metrics ui component
+    homepage_metrics(activity_data=st.session_state['activity_data'],
+                     vars=vars)
 
-if update:
-    with st.spinner('Collecting Data'):
+    # Define second page header
+    st.header('Status of Data')
 
-        # Track state of activity_data file
-        original_date = os.path.getmtime('data/activity_data.csv')
-        modified_date = original_date
+    # Write out when data was last updated
+    last_updated = read_data_metadata()['last_updated']
+    st.write(f'**Data last updated:** {last_updated}')
 
-        # Generate auth url and redirect to authentication page
-        auth_url = get_authorization_url(CLIENT_ID=vars.client_id,
-                                         REDIRECT_URI=vars.redirect_url)
-        webbrowser.open(auth_url)
+    # Update Data Button
+    update = st.button('Update Data')
 
-        # Monitor state of activity data file
-        while original_date == modified_date:
-            modified_date = os.path.getmtime('data/activity_data.csv')
+    if update:
+        with st.spinner('Collecting Data'):
 
-        # Update activity data dataframe
-        st.session_state['activity_data'] = read_activity_data()
+            # Track state of activity_data file
+            original_date = os.path.getmtime('data/activity_data.csv')
+            modified_date = original_date
 
-        # Reload page
-        st.rerun()
+            # Generate auth url and redirect to authentication page
+            auth_url = get_authorization_url(CLIENT_ID=vars.client_id,
+                                             REDIRECT_URI=vars.redirect_url)
+            webbrowser.open(auth_url)
+
+            # Monitor state of activity data file
+            while original_date == modified_date:
+                modified_date = os.path.getmtime('data/activity_data.csv')
+
+            # Update activity data dataframe
+            st.session_state['activity_data'] = read_activity_data()
+
+            # Reload page
+            st.rerun()

@@ -6,7 +6,8 @@ import folium
 import io
 
 from functions.ui_components import \
-    configure_page_config
+    configure_page_config, \
+    login_page
 
 from functions.collect_data import \
     read_activity_data
@@ -21,92 +22,97 @@ if 'download_disabled' not in st.session_state:
 if 'buffer' not in st.session_state:
     st.session_state.buffer = io.BytesIO()
 
-# Define Page Header
-st.title('Heatmap')
+if not st.session_state['logged_in']:
 
-# Render activity type multiselect component
-options = st.multiselect("Activity Type",
-                         ["Run", "Ride", "Walk", "Swim", "Golf"],
-                         ["Run", "Ride", "Walk", "Swim", "Golf"]
-                         )
+    login_page()
 
-# Define 2 columns
-col1, col2 = st.columns(2)
+else:
 
-# Render column 1 components
-with col1:
+    # Define Page Header
+    st.title('Heatmap')
 
-    # Render start date range input button
-    start = st.date_input("Start Date", datetime.date(2016, 1, 1))
+    # Render activity type multiselect component
+    options = st.multiselect("Activity Type",
+                             ["Run", "Ride", "Walk", "Swim", "Golf"],
+                             ["Run", "Ride", "Walk", "Swim", "Golf"])
 
-    # Render Generate Heatmap Button
-    generate = st.button("Generate Heatmap")
+    # Define 2 columns
+    col1, col2 = st.columns(2)
 
-    # Render Download Heatmap Button
-    st.download_button(
-        label="Download Heatmap",
-        data=st.session_state.buffer,
-        file_name='heatmap.html',
-        mime="text/html",
-        disabled=st.session_state.download_disabled
-    )
+    # Render column 1 components
+    with col1:
 
-    # Render success component if download is possible
-    if not st.session_state.download_disabled:
-        st.success('HeatMap Ready for Download')
+        # Render start date range input button
+        start = st.date_input("Start Date", datetime.date(2016, 1, 1))
 
-# Render column 2 components
-with col2:
+        # Render Generate Heatmap Button
+        generate = st.button("Generate Heatmap")
 
-    # Render start date range input button
-    end = st.date_input("End Date", datetime.datetime.today())
+        # Render Download Heatmap Button
+        st.download_button(
+            label="Download Heatmap",
+            data=st.session_state.buffer,
+            file_name='heatmap.html',
+            mime="text/html",
+            disabled=st.session_state.download_disabled
+        )
 
-# Define logic for when Generate Heatmap button is clicked
-if generate:
+        # Render success component if download is possible
+        if not st.session_state.download_disabled:
+            st.success('HeatMap Ready for Download')
 
-    # Render spinner for when heatmap is being created
-    with st.spinner('Generating Heatmap'):
+    # Render column 2 components
+    with col2:
 
-        # Read activity data
-        df = read_activity_data()
+        # Render start date range input button
+        end = st.date_input("End Date", datetime.datetime.today())
 
-        # Construct folium object
-        m = folium.Map(tiles='cartodb positron', location=[51.4837, 0], zoom_start=6)
+    # Define logic for when Generate Heatmap button is clicked
+    if generate:
 
-        # Iterate through activity data and collect polylines
-        for index, row in df.iterrows():
+        # Render spinner for when heatmap is being created
+        with st.spinner('Generating Heatmap'):
 
-            try:
-                # Filter out activities with no gps data
-                if row['distance'] > 0:
+            # Read activity data
+            df = read_activity_data()
 
-                    # Collect polyline data
-                    curve = row['map']
+            # Construct folium object
+            m = folium.Map(tiles='cartodb positron', location=[51.4837, 0], zoom_start=6)
 
-                    # Decode polyline data
-                    data = polyline.decode(curve)
+            # Iterate through activity data and collect polylines
+            for index, row in df.iterrows():
 
-                    # Add polyline data to folium object
-                    folium.PolyLine(data,
-                                    color='#fc4c02',
-                                    weight=1,
-                                    opacity=0.7).add_to(m)
+                try:
+                    # Filter out activities with no gps data
+                    if row['distance'] > 0:
 
-            except BaseException:
-                pass
+                        # Collect polyline data
+                        curve = row['map']
 
-        # Add full screen functionality to folium object
-        Fullscreen(position="topleft").add_to(m)
+                        # Decode polyline data
+                        data = polyline.decode(curve)
 
-        # Convert to html format
-        map_html = m._repr_html_()
+                        # Add polyline data to folium object
+                        folium.PolyLine(data,
+                                        color='#fc4c02',
+                                        weight=1,
+                                        opacity=0.7).add_to(m)
 
-        # Update buffer variable with folium object
-        st.session_state.buffer.write(map_html.encode())
-        st.session_state.buffer.seek(0)
+                except BaseException:
+                    pass
 
-        # Make download available
-        st.session_state.download_disabled = False
+            # Add full screen functionality to folium object
+            Fullscreen(position="topleft").add_to(m)
 
-        # Reload page
-        st.rerun()
+            # Convert to html format
+            map_html = m._repr_html_()
+
+            # Update buffer variable with folium object
+            st.session_state.buffer.write(map_html.encode())
+            st.session_state.buffer.seek(0)
+
+            # Make download available
+            st.session_state.download_disabled = False
+
+            # Reload page
+            st.rerun()
