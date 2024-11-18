@@ -21,6 +21,39 @@ def configure_page_config(initial_sidebar_state: str = "expanded",
     # Ignore all warnings
     warnings.filterwarnings("ignore")
 
+    if 'activity_data' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+
+def login_page():
+
+    # Collect project variables
+    vars = Variables()
+
+    st.title('Login Page')
+
+    col1, _ = st.columns([2, 3])
+
+    with col1:
+
+        # Collect user login inputs
+        username = st.text_input(label='Username')
+        password = st.text_input(label='Password',
+                                type='password')
+
+        # Compare user inputs with accepted values
+        if username == vars.app_username and password == vars.app_password:
+
+            # If credentials are correct 
+            st.session_state['logged_in'] = True
+
+            # Reload page
+            st.rerun()
+
+        else:
+            # Display error message
+            st.warning('Username/Password invalid')
+
 
 def homepage_metrics(activity_data: pd.DataFrame,
                      vars: Variables) -> None:

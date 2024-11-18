@@ -22,3 +22,7 @@ class Variables:
         self.client_id = os.getenv('CLIENT_ID')
         self.client_secret = os.getenv('CLIENT_SECRET')
         self.redirect_url = os.getenv('REDIRECT_URI')
+
+        # Login credentials
+        self.app_username = os.getenv('APP_USERNAME')
+        self.app_password = os.getenv('APP_PASSWORD')
