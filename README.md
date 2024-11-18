@@ -17,6 +17,8 @@ To successfully run this project locally the following conditions must be met:
     - `CLIENT_ID` - available from your API application dashboard page
     - `CLIENT_SECRET` - available from your API application dashboard page
     - `REDIRECT_URI` - should be `'http://localhost:5000/callback'` when running the project locally
+    - `APP_USERNAME` - can be anything, used when first loading up the page
+    - `APP_PASSWORD` - can be anything, used when first loading up the page
 
 ### Running the Project
 

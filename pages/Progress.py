@@ -14,6 +14,7 @@ configure_page_config()
 
 if not st.session_state['logged_in']:
 
+    # Render login component
     login_page()
 
 else:

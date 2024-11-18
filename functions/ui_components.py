@@ -39,12 +39,12 @@ def login_page():
         # Collect user login inputs
         username = st.text_input(label='Username')
         password = st.text_input(label='Password',
-                                type='password')
+                                 type='password')
 
         # Compare user inputs with accepted values
         if username == vars.app_username and password == vars.app_password:
 
-            # If credentials are correct 
+            # If credentials are correct
             st.session_state['logged_in'] = True
 
             # Reload page

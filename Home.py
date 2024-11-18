@@ -33,6 +33,7 @@ if st.session_state.activity_data is None:
 
 if not st.session_state['logged_in']:
 
+    # Render login component
     login_page()
 
 else:
