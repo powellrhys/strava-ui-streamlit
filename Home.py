@@ -29,7 +29,7 @@ if 'activity_data' not in st.session_state:
 
 # Read in activity data
 if st.session_state.activity_data is None:
-    st.session_state['activity_data'] = read_activity_data()
+    st.session_state['activity_data'] = read_activity_data(vars=vars)
 
 if not st.session_state['logged_in']:
 
@@ -50,7 +50,7 @@ else:
     st.header('Status of Data')
 
     # Write out when data was last updated
-    last_updated = read_data_metadata()['last_updated']
+    last_updated = read_data_metadata(vars=vars)['last_updated']
     st.write(f'**Data last updated:** {last_updated}')
 
     # Update Data Button

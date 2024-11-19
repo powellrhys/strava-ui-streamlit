@@ -1,3 +1,7 @@
+from functions.variables import Variables
+
+from azure.storage.blob import BlobServiceClient
+from io import StringIO
 import pandas as pd
 import requests
 import shutil
@@ -84,15 +88,33 @@ def export_activity_data(data: list,
     shutil.move(f'{output_directory}/{output_filename}', 'data/activity_data.csv')
 
 
-def read_activity_data() -> pd.DataFrame:
+def read_activity_data(vars: Variables) -> pd.DataFrame:
     '''
-    Input: None
+    Input: Project variables object
     Output: Activity Data Dataframe
     Function to read activity data dataframe from local file store
     '''
-    # Read activity data from local file store
-    with open('data/activity_data.csv', 'r', encoding='utf-8') as file:
-        df = pd.read_csv(file)
+    if vars.use_local_storage:
+
+        # Read activity data from local file store
+        with open('data/activity_data.csv', 'r', encoding='utf-8') as file:
+            df = pd.read_csv(file)
+
+    else:
+
+        # Create BlobServiceClient object
+        blob_service_client = BlobServiceClient.from_connection_string(vars.storage_account_conneciton_string)
+
+        # Get a BlobClient for the specific blob
+        blob_client = blob_service_client.get_blob_client(container=vars.storage_account_container_name,
+                                                          blob='activity_data.csv')
+
+        # Download blob content as a stream
+        blob_data = blob_client.download_blob().readall()
+
+        # Convert blob data to a pandas DataFrame
+        csv_data = StringIO(blob_data.decode('utf-8'))
+        df = pd.read_csv(csv_data)
 
     # Cast date as pandas datatime object
     df['start_date'] = pd.to_datetime(df['start_date'])
@@ -100,9 +122,31 @@ def read_activity_data() -> pd.DataFrame:
     return df
 
 
-def read_data_metadata() -> dict:
+def read_data_metadata(vars: Variables) -> dict:
+    '''
+    Input: Project Variables Object
+    Output: Json payload of project metadata
+    Function to read project metadata
+    '''
+    if vars.use_local_storage:
+        with open('data/last_updated.json') as f:
+            data = json.load(f)
 
-    with open('data/last_updated.json') as f:
-        data = json.load(f)
+        return data
 
-    return data
+    else:
+
+        # Create BlobServiceClient object
+        blob_service_client = BlobServiceClient.from_connection_string(vars.storage_account_conneciton_string)
+
+        # Get a BlobClient for the specific blob
+        blob_client = blob_service_client.get_blob_client(container=vars.storage_account_container_name,
+                                                          blob='last_updated.json')
+
+        # Download blob content as a stream
+        blob_data = blob_client.download_blob().readall()
+
+        # Parse JSON content
+        data = json.loads(blob_data.decode('utf-8'))
+
+        return data

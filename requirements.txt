@@ -1,6 +1,7 @@
-pandas
-polyline
-streamlit
-folium
-streamlit_folium
-python-dotenv
+pandas==2.2.3
+polyline==2.0.2
+streamlit==1.40.1
+folium==0.18.0
+streamlit_folium==0.23.2
+python-dotenv==1.0.1
+azure-storage-blob==12.24.0
