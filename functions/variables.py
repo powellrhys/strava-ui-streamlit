@@ -24,10 +24,11 @@ class Variables:
         self.redirect_url = os.getenv('REDIRECT_URI')
 
         # Storage account varibales
-        self.use_local_storage = eval(os.getenv('USE_LOCAL_STORAGE'))
+        self.use_local_storage = eval(os.getenv('USE_LOCAL_STORAGE', str(True)))
         self.storage_account_conneciton_string = os.getenv('STORAGE_ACCOUNT_CONNECTION_STRING')
         self.storage_account_container_name = os.getenv('STORAGE_ACCOUNT_CONTAINER_NAME')
 
         # Login credentials
+        self.login_required = eval(os.getenv('LOGIN_REQUIRED', str(False)))
         self.app_username = os.getenv('APP_USERNAME')
         self.app_password = os.getenv('APP_PASSWORD')

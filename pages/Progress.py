@@ -9,10 +9,16 @@ from functions.ui_components import \
 from functions.collect_data import \
     read_activity_data
 
+from functions.variables import \
+    Variables
+
 # Setup page config
 configure_page_config()
 
-if not st.session_state['logged_in']:
+# Load page variables
+vars = Variables()
+
+if not st.session_state['logged_in'] and vars.login_required:
 
     # Render login component
     login_page()
@@ -78,7 +84,7 @@ else:
     else:
         grouped_df = activity_data \
             .groupby([activity_data['start_date'].dt.to_period(resolution), 'type']) \
-            .sum().reset_index()
+            .sum(numeric_only=True).reset_index()
 
     # Filter by activity type
     grouped_df = grouped_df[grouped_df['type'].isin(selected_activity_type)]

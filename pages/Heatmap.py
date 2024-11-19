@@ -12,8 +12,14 @@ from functions.ui_components import \
 from functions.collect_data import \
     read_activity_data
 
+from functions.variables import \
+    Variables
+
 # Setup page config
 configure_page_config()
+
+# Load page variables
+vars = Variables()
 
 # Configure page initial state
 if 'download_disabled' not in st.session_state:
@@ -22,7 +28,7 @@ if 'download_disabled' not in st.session_state:
 if 'buffer' not in st.session_state:
     st.session_state.buffer = io.BytesIO()
 
-if not st.session_state['logged_in']:
+if not st.session_state['logged_in'] and vars.login_required:
 
     # Render login component
     login_page()
