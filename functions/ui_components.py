@@ -30,8 +30,10 @@ def login_page():
     # Collect project variables
     vars = Variables()
 
+    # Login page title
     st.title('Login Page')
 
+    # Define column structure for page
     col1, _ = st.columns([2, 3])
 
     with col1:

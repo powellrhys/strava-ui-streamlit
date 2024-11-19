@@ -19,7 +19,7 @@ from functions.variables import \
     Variables
 
 # Setup page config
-configure_page_config()
+configure_page_config(initial_sidebar_state='collapsed')
 
 # Collect codebase variables
 vars = Variables()
@@ -31,7 +31,7 @@ if 'activity_data' not in st.session_state:
 if st.session_state.activity_data is None:
     st.session_state['activity_data'] = read_activity_data(vars=vars)
 
-if not st.session_state['logged_in']:
+if not st.session_state['logged_in'] and vars.login_required:
 
     # Render login component
     login_page()

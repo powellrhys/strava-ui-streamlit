@@ -14,15 +14,16 @@ from functions.variables import \
 # Setup page config
 configure_page_config()
 
-if not st.session_state['logged_in']:
+# Load page variables
+vars = Variables()
+
+
+if not st.session_state['logged_in'] and vars.login_required:
 
     # Render login component
     login_page()
 
 else:
-
-    # Load page variables
-    vars = Variables()
 
     # Read in activity data
     activity_data = read_activity_data(vars=vars)
