@@ -20,7 +20,7 @@ if not st.session_state['logged_in']:
 else:
 
     # Read in activity data
-    activity_data = read_activity_data()
+    activity_data = read_activity_data(vars=vars)
 
     # Convert distance from meters to kilometers
     activity_data['distance'] = activity_data['distance'] / 1000

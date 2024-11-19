@@ -19,6 +19,9 @@ To successfully run this project locally the following conditions must be met:
     - `REDIRECT_URI` - should be `'http://localhost:5000/callback'` when running the project locally
     - `APP_USERNAME` - can be anything, used when first loading up the page
     - `APP_PASSWORD` - can be anything, used when first loading up the page
+    - `STORAGE_ACCOUNT_CONNECTION_STRING` - The connection string for your azure blob storage account (only applicable if not using local storage)
+    - `STORAGE_ACCOUNT_CONTAINER_NAME` - The container name where the data is stored (only applicable if not using local storage)
+    - `USE_LOCAL_STORAGE` - Flag to indicate whether data is being collected from your local file store or from azure blob storage container
 
 ### Running the Project
 

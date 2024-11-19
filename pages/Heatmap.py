@@ -24,6 +24,7 @@ if 'buffer' not in st.session_state:
 
 if not st.session_state['logged_in']:
 
+    # Render login component
     login_page()
 
 else:
@@ -74,7 +75,7 @@ else:
         with st.spinner('Generating Heatmap'):
 
             # Read activity data
-            df = read_activity_data()
+            df = read_activity_data(vars=vars)
 
             # Construct folium object
             m = folium.Map(tiles='cartodb positron', location=[51.4837, 0], zoom_start=6)

@@ -16,6 +16,7 @@ configure_page_config()
 
 if not st.session_state['logged_in']:
 
+    # Render login component
     login_page()
 
 else:
@@ -24,7 +25,7 @@ else:
     vars = Variables()
 
     # Read in activity data
-    activity_data = read_activity_data()
+    activity_data = read_activity_data(vars=vars)
 
     # Drop index when reading in data from csv
     activity_data = activity_data.drop([activity_data.columns[0]], axis=1)
