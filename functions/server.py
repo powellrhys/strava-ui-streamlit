@@ -1,7 +1,15 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI
+from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from azure.storage.blob import BlobServiceClient
+from selenium import webdriver
 from datetime import datetime
+from fastapi import FastAPI
 import json
+
+from functions.variables import \
+    Variables
 
 
 def configure_server():
@@ -25,7 +33,9 @@ def configure_server():
     return app
 
 
-def export_data_metadata() -> None:
+def export_data_metadata(vars: Variables,
+                         container: str,
+                         output_filename: str) -> None:
     '''
     Input: None
     Output: None
@@ -36,6 +46,29 @@ def export_data_metadata() -> None:
         'last_updated': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     }
 
-    # Write dictionary to file store
-    with open('data/last_updated.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+    json_object = json.dumps(data)
+
+    blob_service_client = BlobServiceClient.from_connection_string(vars.storage_account_conneciton_string)
+
+    # Upload CSV to Azure Blob Storage
+    blob_client = blob_service_client.get_blob_client(container=container, blob=output_filename)
+
+    blob_client.upload_blob(json_object, overwrite=True)
+
+
+def configure_driver(driver_path: str = 'chromedriver.exe',
+                     headless: bool = False) -> WebDriver:
+
+    # Configure logging to suppress unwanted messages
+    chrome_options = Options()
+    chrome_options.add_argument("--log-level=3")
+
+    if headless:
+        chrome_options.add_argument("--headless")
+
+    # Configure Driver with options
+    service = Service(executable_path=driver_path)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.maximize_window()
+
+    return driver

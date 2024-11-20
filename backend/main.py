@@ -46,11 +46,14 @@ def callback(req: Request):
 
             # Export data as csv to local file store
             export_activity_data(data=data,
-                                 output_directory='data',
-                                 output_filename='temp_activity_data.csv')
+                                 vars=vars,
+                                 container='strava',
+                                 output_filename='activity_data.csv')
 
             # Update last updated metadata
-            export_data_metadata()
+            export_data_metadata(vars=vars,
+                                 container='strava',
+                                 output_filename='last_updated.json')
 
             return 'All Activity Data Collected'
 

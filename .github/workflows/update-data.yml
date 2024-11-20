@@ -10,7 +10,7 @@ on:
       - feature/*
 
 jobs:
-  test:
+  Update-Data:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +36,24 @@ jobs:
       run: |
         sleep 5  # Give time for the FastAPI server to start
 
-    # - name: Run tests
-    #   run: |
-    #     python test_script.py
+    # Configure and install Chrome
+    - name: Set up Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        google-chrome --version
+
+    # Configure ChromeDriver
+    - name: Set up ChromeDriver
+      run: |
+        sudo apt-get install -y chromium-chromedriver
+        chromedriver --version
+
+    - name: Run tests
+      env:
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+        STRAVA_USERNAME: ${{ secrets.STRAVA_USERNAME }}
+        STRAVA_PASSWORD: ${{ secrets.STRAVA_PASSWORD }}
+      run: |
+        python -m backend.data_collection
