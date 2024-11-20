@@ -18,11 +18,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Setup python 
+      # Setup python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9 
+          python-version: 3.9
 
       # Install project dependencies
       - name: Install dependencies
