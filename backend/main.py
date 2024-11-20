@@ -45,13 +45,13 @@ def callback(req: Request):
             data = collect_all_activity_data(access_token=token_data['access_token'],
                                              per_page=200)
 
-            # Export data as csv to local file store
+            # Export data as csv to blob storage
             export_activity_data(data=data,
                                  vars=vars,
                                  container='strava',
                                  output_filename='activity_data.csv')
 
-            # Update last updated metadata
+            # Update last updated metadata flag in blob storage
             export_data_metadata(vars=vars,
                                  container='strava',
                                  output_filename='last_updated.json')

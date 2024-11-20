@@ -2,15 +2,16 @@
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+
+# Import Python dependencies
 import warnings
 import logging
 
+# Import custom project functions
 from functions.authentication import \
     get_authorization_url
-
 from functions.variables import \
     Variables
-
 from functions.server import \
     configure_driver
 
@@ -33,7 +34,7 @@ driver = configure_driver(driver_path=vars.driver_path,
                           headless=True)
 logger.info('Selenium Driver Configured')
 
-# Generate auth url and redirect to authentication page
+# Generate auth url
 auth_url = get_authorization_url(CLIENT_ID=vars.client_id,
                                  REDIRECT_URI=vars.redirect_url)
 logger.info('Authentication URL generated')
@@ -60,7 +61,7 @@ WebDriverWait(driver, 10) \
 driver.find_element(By.ID, "login-button").click()
 logger.info('Login button clicked')
 
-# Click Submit on login form
+# Authorize access to data following login
 WebDriverWait(driver, 10) \
     .until(EC.element_to_be_clickable((By.ID, "authorize")))
 driver.find_element(By.ID, "authorize").click()

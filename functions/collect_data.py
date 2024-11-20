@@ -59,8 +59,8 @@ def export_activity_data(data: list,
                          container: str,
                          output_filename: str) -> None:
     '''
-    Input: Activity data, output directory and filename
-    Output: CSV written to local file store
+    Input: Activity data, project variables, blob container name and filename
+    Output: None
     Function to export data as csv to local file store
     '''
     # Generate pandas dataframe from data collected
@@ -86,11 +86,13 @@ def export_activity_data(data: list,
     csv_buffer = StringIO()
     df.to_csv(csv_buffer, index=False)
 
+    # Connect to blob storage account
     blob_service_client = BlobServiceClient.from_connection_string(vars.storage_account_conneciton_string)
 
-    # Upload CSV to Azure Blob Storage
+    # Connect to container within the storage account
     blob_client = blob_service_client.get_blob_client(container=container, blob=output_filename)
 
+    # Upload CSV to Azure Blob Storage
     blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
 
 
