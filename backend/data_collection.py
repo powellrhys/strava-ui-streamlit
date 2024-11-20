@@ -44,25 +44,25 @@ logger.info('Navigate to auth url completed')
 
 # Enter email into login form
 WebDriverWait(driver, 10) \
-    .until(EC.presence_of_element_located((By.ID, 'email')))
+    .until(EC.element_to_be_clickable((By.ID, 'email')))
 driver.find_element(By.ID, 'email').send_keys(vars.strava_username)
 logger.info('Strava username entered')
 
 # Enter Password into login form
 WebDriverWait(driver, 10) \
-    .until(EC.presence_of_element_located((By.ID, 'password')))
+    .until(EC.element_to_be_clickable((By.ID, 'password')))
 driver.find_element(By.ID, 'password').send_keys(vars.strava_password)
 logger.info('Strava password entered')
 
 # Click Submit on login form
 WebDriverWait(driver, 10) \
-    .until(EC.presence_of_element_located((By.ID, "login-button")))
+    .until(EC.element_to_be_clickable((By.ID, "login-button")))
 driver.find_element(By.ID, "login-button").click()
 logger.info('Login button clicked')
 
 # Click Submit on login form
 WebDriverWait(driver, 10) \
-    .until(EC.presence_of_element_located((By.ID, "authorize")))
+    .until(EC.element_to_be_clickable((By.ID, "authorize")))
 driver.find_element(By.ID, "authorize").click()
 logger.info('Strava api authorization completed')
 
