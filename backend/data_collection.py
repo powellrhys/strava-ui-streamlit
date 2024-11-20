@@ -29,7 +29,7 @@ logger.addHandler(log_handler)
 vars = Variables()
 
 # Configure Selenium Driver
-driver = configure_driver(driver_path='chromedriver.exe',
+driver = configure_driver(driver_path=vars.driver_path,
                           headless=True)
 logger.info('Selenium Driver Configured')
 

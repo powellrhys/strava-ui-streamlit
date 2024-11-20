@@ -32,10 +32,6 @@ jobs:
         uvicorn backend.main:app --host 0.0.0.0 --port 5000 &
       shell: bash
 
-    - name: Wait for server to start
-      run: |
-        sleep 5  # Give time for the FastAPI server to start
-
     # Configure and install Chrome
     - name: Set up Chrome
       run: |
@@ -49,11 +45,12 @@ jobs:
         sudo apt-get install -y chromium-chromedriver
         chromedriver --version
 
-    - name: Run tests
+    - name: Run Data Collection Script
       env:
         CLIENT_ID: ${{ secrets.CLIENT_ID }}
         REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
         STRAVA_USERNAME: ${{ secrets.STRAVA_USERNAME }}
         STRAVA_PASSWORD: ${{ secrets.STRAVA_PASSWORD }}
+        DRIVER_PATH: '/usr/bin/chromedriver'
       run: |
         python -m backend.data_collection
