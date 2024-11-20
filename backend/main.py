@@ -17,6 +17,7 @@ from functions.variables import \
 
 # Load environmental variables
 vars = Variables()
+
 # Configure backend API
 app = configure_server()
 

@@ -93,11 +93,6 @@ def export_activity_data(data: list,
 
     blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
 
-    # # Write dataframe to blob storage
-    # df.to_csv(f'{output_directory}/{output_filename}')
-
-    # shutil.move(f'{output_directory}/{output_filename}', 'data/activity_data.csv')
-
 
 def read_activity_data(vars: Variables) -> pd.DataFrame:
     '''
