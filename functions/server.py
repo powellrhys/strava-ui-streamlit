@@ -59,12 +59,14 @@ def export_data_metadata(vars: Variables,
 def configure_driver(driver_path: str = 'chromedriver.exe',
                      headless: bool = False) -> WebDriver:
 
+    # Define headless state user agent
+    user_agent = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)" + \
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.199 Safari/537.36"
+
     # Configure logging to suppress unwanted messages
     chrome_options = Options()
     chrome_options.add_argument("--log-level=3")
-    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-                                "AppleWebKit/537.36 (KHTML, like Gecko)",
-                                "Chrome/114.0.5735.199 Safari/537.36")
+    chrome_options.add_argument(user_agent)
 
     if headless:
         chrome_options.add_argument("--headless")
