@@ -4,7 +4,6 @@ from azure.storage.blob import BlobServiceClient
 from io import StringIO
 import pandas as pd
 import requests
-import shutil
 import json
 
 def get_activity_data(access_token: str,
@@ -56,11 +55,12 @@ def collect_all_activity_data(access_token: str,
 
 
 def export_activity_data(data: list,
-                         output_directory: str,
-                         output_filename: str):
+                         vars: Variables,
+                         container: str,
+                         output_filename: str) -> None:
     '''
-    Input: Activity data, output directory and filename
-    Output: CSV written to local file store
+    Input: Activity data, project variables, blob container name and filename
+    Output: None
     Function to export data as csv to local file store
     '''
     # Generate pandas dataframe from data collected
@@ -82,10 +82,18 @@ def export_activity_data(data: list,
     # Clean up polyline data from map column in dataframe
     df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
 
-    # Write dataframe to blob storage
-    df.to_csv(f'{output_directory}/{output_filename}')
+    # Convert DataFrame to CSV in memory
+    csv_buffer = StringIO()
+    df.to_csv(csv_buffer, index=False)
 
-    shutil.move(f'{output_directory}/{output_filename}', 'data/activity_data.csv')
+    # Connect to blob storage account
+    blob_service_client = BlobServiceClient.from_connection_string(vars.storage_account_conneciton_string)
+
+    # Connect to container within the storage account
+    blob_client = blob_service_client.get_blob_client(container=container, blob=output_filename)
+
+    # Upload CSV to Azure Blob Storage
+    blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
 
 
 def read_activity_data(vars: Variables) -> pd.DataFrame:

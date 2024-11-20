@@ -22,7 +22,6 @@ jobs:
       packages: write
 
     steps:
-
       # Checkout repository Code
       - name: Checkout repository
         uses: actions/checkout@v3

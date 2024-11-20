@@ -28,7 +28,14 @@ class Variables:
         self.storage_account_conneciton_string = os.getenv('STORAGE_ACCOUNT_CONNECTION_STRING')
         self.storage_account_container_name = os.getenv('STORAGE_ACCOUNT_CONTAINER_NAME')
 
-        # Login credentials
+        # App Login credentials
         self.login_required = eval(os.getenv('LOGIN_REQUIRED', str(False)))
         self.app_username = os.getenv('APP_USERNAME')
         self.app_password = os.getenv('APP_PASSWORD')
+
+        # Strava Login Credentials
+        self.strava_username = os.getenv('STRAVA_USERNAME')
+        self.strava_password = os.getenv('STRAVA_PASSWORD')
+
+        # Selenium Variables:
+        self.driver_path = os.getenv('DRIVER_PATH', 'chromedriver.exe')
