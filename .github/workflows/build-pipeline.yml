@@ -87,7 +87,7 @@ jobs:
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
       # Push to DockerHub Container Registry
-      - name: Push ${{ github.repository } to DockerHub Container registry
+      - name: Push ${{ github.repository }} to DockerHub Container registry
         run: |
           docker tag $REGISTRY/$IMAGE_NAME:latest $IMAGE_NAME:latest
           docker push $IMAGE_NAME
