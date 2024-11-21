@@ -1,4 +1,4 @@
-name: Lint Codebase
+name: Build Project
 on:
   workflow_dispatch:
   pull_request:
@@ -50,6 +50,7 @@ jobs:
 
   build-container:
     name: Build Container
+    needs: lint-codebase
     runs-on: ubuntu-latest
     permissions:
       contents: read
