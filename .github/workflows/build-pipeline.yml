@@ -114,8 +114,8 @@ jobs:
       # Stop the Web App
       - name: Stop Azure Web App
         run: |
-          az webapp stop `
-          --name ${{ secrets.WEBAPP_NAME }} `
+          az webapp stop \
+          --name ${{ secrets.WEBAPP_NAME }} \
           --resource-group ${{ secrets.WEBAPP_RESOURCE_GROUP }}
 
       # Wait for webapp to stop
