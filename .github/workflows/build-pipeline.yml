@@ -1,4 +1,4 @@
-name: Lint Codebase
+name: Build Project
 on:
   workflow_dispatch:
   pull_request:
@@ -47,3 +47,47 @@ jobs:
       - name: Lint with yamllint
         run: |
           yamllint -c .yamllint.yml .
+
+  build-container:
+    name: Build Container
+    needs: lint-codebase
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # Checkout repository Code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Login into Github Container Registry
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build Container
+      - name: "Build image: ${{ github.repository }}"
+        run: docker build -f Dockerfile -t $REGISTRY/$IMAGE_NAME .
+
+      # Push Container to github container registry
+      - name: Push ${{ github.repository }} to GitHub container registry
+        run: |
+          docker push $REGISTRY/$IMAGE_NAME:latest
+
+      # Login to DockerHub
+      - name: DockerHub Login
+        env:
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      # Push to DockerHub Container Registry
+      - name: Push ${{ github.repository }} to DockerHub Container registry
+        run: |
+          docker tag $REGISTRY/$IMAGE_NAME:latest $IMAGE_NAME:latest
+          docker push $IMAGE_NAME
