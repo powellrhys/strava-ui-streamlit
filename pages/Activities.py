@@ -1,13 +1,13 @@
+# Import python dependencies
 import streamlit as st
 import pandas as pd
 
+# Import project functions
 from functions.ui_components import \
     configure_page_config, \
     login_page
-
 from functions.collect_data import \
     read_activity_data
-
 from functions.variables import \
     Variables
 
@@ -27,9 +27,6 @@ else:
 
     # Read in activity data
     activity_data = read_activity_data(vars=vars)
-
-    # Drop index when reading in data from csv
-    activity_data = activity_data.drop([activity_data.columns[0]], axis=1)
 
     # Collect a list of unique activity types
     all_activity_types = activity_data['type'].unique().tolist()

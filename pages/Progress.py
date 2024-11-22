@@ -1,14 +1,14 @@
-import streamlit as st
-import plotly.express as px
+# Import python dependencies
 from datetime import datetime
+import plotly.express as px
+import streamlit as st
 
+# Import project functions
 from functions.ui_components import \
     configure_page_config, \
     login_page
-
 from functions.collect_data import \
     read_activity_data
-
 from functions.variables import \
     Variables
 

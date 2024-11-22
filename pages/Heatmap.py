@@ -1,3 +1,4 @@
+# Import python dependencies
 from folium.plugins import Fullscreen
 import streamlit as st
 import polyline
@@ -5,13 +6,12 @@ import datetime
 import folium
 import io
 
+# Import project dependencies
 from functions.ui_components import \
     configure_page_config, \
     login_page
-
 from functions.collect_data import \
     read_activity_data
-
 from functions.variables import \
     Variables
 
