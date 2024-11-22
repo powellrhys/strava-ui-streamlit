@@ -1,4 +1,4 @@
-name: Build Project
+name: Build & Deploy Project
 on:
   workflow_dispatch:
   pull_request:
