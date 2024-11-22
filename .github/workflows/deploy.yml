@@ -101,7 +101,7 @@ jobs:
       packages: write
 
     steps:
-      # Checkout repository (optional if not needed)
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
