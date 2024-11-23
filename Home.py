@@ -1,20 +1,19 @@
+# Import python dependencies
 import streamlit as st
-import webbrowser
-import os
+import time
 
+# Import project functions
 from functions.ui_components import \
+    github_actions_alerts, \
     configure_page_config, \
     homepage_metrics, \
     login_page
-
+from functions.github_actions import \
+    trigger_update_dat_github_action, \
+    get_latest_workflow_run_id
 from functions.collect_data import \
     read_activity_data, \
     read_data_metadata
-
-from functions.authentication import \
-    get_authorization_url
-
-
 from functions.variables import \
     Variables
 
@@ -59,21 +58,19 @@ else:
     if update:
         with st.spinner('Collecting Data'):
 
-            # Track state of activity_data file
-            original_date = os.path.getmtime('data/activity_data.csv')
-            modified_date = original_date
+            # Trigger collect data github action
+            trigger_update_dat_github_action(access_token=vars.github_access_token)
 
-            # Generate auth url and redirect to authentication page
-            auth_url = get_authorization_url(CLIENT_ID=vars.client_id,
-                                             REDIRECT_URI=vars.redirect_url)
-            webbrowser.open(auth_url)
+            # Wait and fetch latest github action workflow run id
+            time.sleep(5)
+            workflow_run_id = get_latest_workflow_run_id(access_token=vars.github_access_token)
 
-            # Monitor state of activity data file
-            while original_date == modified_date:
-                modified_date = os.path.getmtime('data/activity_data.csv')
+            # Render github action alerts ui component
+            github_actions_alerts(access_token=vars.github_access_token,
+                                  workflow_run_id=workflow_run_id)
 
             # Update activity data dataframe
-            st.session_state['activity_data'] = read_activity_data()
+            st.session_state['activity_data'] = read_activity_data(vars=vars)
 
             # Reload page
             st.rerun()

@@ -37,5 +37,8 @@ class Variables:
         self.strava_username = os.getenv('STRAVA_USERNAME')
         self.strava_password = os.getenv('STRAVA_PASSWORD')
 
-        # Selenium Variables:
+        # Selenium variables
         self.driver_path = os.getenv('DRIVER_PATH', 'chromedriver.exe')
+
+        # Github variables
+        self.github_access_token = os.getenv('GITHUB_ACCESS_TOKEN')

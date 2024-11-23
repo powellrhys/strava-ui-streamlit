@@ -1,4 +1,4 @@
-name: Build Project
+name: Build & Deploy Project
 on:
   workflow_dispatch:
   pull_request:
@@ -91,3 +91,41 @@ jobs:
         run: |
           docker tag $REGISTRY/$IMAGE_NAME:latest $IMAGE_NAME:latest
           docker push $IMAGE_NAME
+
+  restart-application:
+    name: Restart Application
+    needs: build-container
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Login to Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Stop the Web App
+      - name: Stop Azure Web App
+        run: |
+          az webapp stop \
+          --name ${{ secrets.WEBAPP_NAME }} \
+          --resource-group ${{ secrets.WEBAPP_RESOURCE_GROUP }}
+
+      # Wait for webapp to stop
+      - name: Wait for webapp to stop
+        run: |
+          sleep 10
+
+      # Start the Web App
+      - name: Stop Azure Web App
+        run: |
+          az webapp start \
+          --name ${{ secrets.WEBAPP_NAME }} \
+          --resource-group ${{ secrets.WEBAPP_RESOURCE_GROUP }}

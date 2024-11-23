@@ -1,8 +1,15 @@
+# Import python dependencies
 import streamlit as st
 import pandas as pd
 import warnings
+import time
 
-from functions.variables import Variables
+# Import project functions
+from functions.github_actions import \
+    monitor_github_action
+from functions.variables import \
+    Variables
+
 
 def configure_page_config(initial_sidebar_state: str = "expanded",
                           layout: str = "wide") -> None:
@@ -25,7 +32,7 @@ def configure_page_config(initial_sidebar_state: str = "expanded",
         st.session_state['logged_in'] = False
 
 
-def login_page():
+def login_page() -> None:
 
     # Collect project variables
     vars = Variables()
@@ -102,3 +109,48 @@ def homepage_metrics(activity_data: pd.DataFrame,
                       value=f"{round(data[activity_types[i]][2024]['distance'], 2)} km",
                       delta=f"{round(diff, 2)} km"
                       )
+
+
+def github_actions_alerts(access_token: str,
+                          workflow_run_id: str,
+                          poll_interval: int = 10) -> None:
+    '''
+    Input: GitHub access toke, github action workflow id, polling frequency
+    Output: None
+    Function to display github action alerts on the frontend
+    '''
+    # Define empty streamlit container
+    with st.empty():
+
+        # Define counter variable
+        counter = 1
+
+        # Continue to poll github action until action is complete
+        while True:
+
+            # Get status of github action
+            response = monitor_github_action(access_token=access_token,
+                                             workflow_run_id=workflow_run_id)
+
+            # Handle request error
+            if response.status_code != 200:
+                st.error(f"Error fetching workflow run status: {response.status_code} {response.text}")
+                return None
+
+            # Decode response
+            run_data = response.json()
+            status = run_data.get("status")
+            conclusion = run_data.get("conclusion")
+
+            # Handle successful request
+            if status == "completed":
+                st.success(f"Workflow completed with conclusion: {conclusion}")
+                return None
+            else:
+                st.info(f"Pipeline Status Checks Made: {counter} - Workflow Run Status: {status}")
+
+            # Delay next request
+            time.sleep(poll_interval)
+
+            # Increment counter variable
+            counter = counter + 1
