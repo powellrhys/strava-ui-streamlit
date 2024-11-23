@@ -32,7 +32,7 @@ def configure_page_config(initial_sidebar_state: str = "expanded",
         st.session_state['logged_in'] = False
 
 
-def login_page():
+def login_page() -> None:
 
     # Collect project variables
     vars = Variables()
@@ -113,7 +113,7 @@ def homepage_metrics(activity_data: pd.DataFrame,
 
 def github_actions_alerts(access_token: str,
                           workflow_run_id: str,
-                          poll_interval: int = 5):
+                          poll_interval: int = 10) -> None:
     '''
     Input: GitHub access toke, github action workflow id, polling frequency
     Output: None

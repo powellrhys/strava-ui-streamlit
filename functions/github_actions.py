@@ -1,7 +1,7 @@
 import requests
 
 def trigger_update_dat_github_action(access_token: str,
-                                     ref: str = 'main'):
+                                     ref: str = 'main') -> dict:
     '''
     Input: Access token and branch reference
     Output: Request response
@@ -33,7 +33,7 @@ def trigger_update_dat_github_action(access_token: str,
     return response.json() if response.content else {}
 
 
-def get_latest_workflow_run_id(access_token: str):
+def get_latest_workflow_run_id(access_token: str) -> int:
     '''
     Input: Access token
     Output: Workflow run id
@@ -67,8 +67,7 @@ def get_latest_workflow_run_id(access_token: str):
 
 
 def monitor_github_action(access_token: str,
-                          workflow_run_id: int,
-                          poll_interval: int = 5):
+                          workflow_run_id: int) -> requests:
     '''
     Input: Access token, workflow run id and polling frequency
     Output: Request response
