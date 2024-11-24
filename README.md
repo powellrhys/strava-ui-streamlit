@@ -21,8 +21,8 @@ To successfully run this project locally the following conditions must be met:
     - `APP_PASSWORD` - can be anything, used when first loading up the page
     - `STORAGE_ACCOUNT_CONNECTION_STRING` - The connection string for your azure blob storage account (only applicable if not using local storage)
     - `STORAGE_ACCOUNT_CONTAINER_NAME` - The container name where the data is stored (only applicable if not using local storage)
-    - `USE_LOCAL_STORAGE` - Flag to indicate whether data is being collected from your local file store or from azure blob storage container. This value will default to `False`, forcing the application to pull data from the connected storage account.
-    - `LOGIN_REQUIRED` - Flag to determine whether the user needs to login to see the page content. The value will default to `True` if not specified. For development purposes, useful, its useful to override this value with `False`.
+    - `USE_LOCAL_STORAGE` - Flag to indicate whether data is being collected from your local file store or from an azure blob storage container. This value will default to `False`, forcing the application to pull data from the connected storage account.
+    - `LOGIN_REQUIRED` - Flag to determine whether the user needs to login to see the page content. The value will default to `True` if not specified. For development purposes, it's useful to override this value with `False`.
     - `GITHUB_ACCESS_TOKEN` - PAT token taken from github to trigger the data collection github action.  
 
 ### Running the Project
@@ -31,7 +31,7 @@ Data is collected via an input button on the landing page. Therefore, to first c
 
 `streamlit run Home.py`
 
-Data is collected via a github action. To trigger this action from the frontend, a github PAT token is required and should be stored under the `GITHUB_ACCESS_TOKEN` environmental variable. This pipeline stores all necessary data in a azure blob storage account for which an `STORAGE_ACCOUNT_CONNECTION_STRING` and `STORAGE_ACCOUNT_CONTAINER_NAME` are required. To collect data from your own account, a similar setup is required. 
+Data is collected via a github action. To trigger this action from the frontend, a github PAT token is required and should be stored under the `GITHUB_ACCESS_TOKEN` environmental variable. This pipeline stores all necessary data in an azure blob storage account for which an `STORAGE_ACCOUNT_CONNECTION_STRING` and `STORAGE_ACCOUNT_CONTAINER_NAME` are required. To collect data from your own account, a similar setup is required. 
 
 ### Project Overview
 
