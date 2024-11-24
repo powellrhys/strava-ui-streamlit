@@ -39,13 +39,25 @@ else:
     start_date = datetime(2016, 1, 1)
     end_date = datetime(datetime.now().year, 12, 31)
 
+    # Granularity radio input
+    plot_resolution = st.sidebar.radio(label='Plot Resolution',
+                                       options=['Yearly', 'Monthly'])
+
+    # Map granularity input to chart resolution
+    if plot_resolution == 'Yearly':
+        resolution = 'Y'
+        date_slider_format = 'YYYY'
+    elif plot_resolution == 'Monthly':
+        resolution = 'M'
+        date_slider_format = 'MM/YYYY'
+
     # Create a slider with two datetime values
     date_range = st.sidebar.slider(
         label="Select a range of dates:",
         min_value=start_date,
         max_value=end_date,
         value=(start_date, end_date),
-        format="MM/YYYY"
+        format=date_slider_format
     )
 
     # Activity multiselect input
@@ -64,16 +76,6 @@ else:
     # Chart type radio input
     chart_type = st.sidebar.radio(label='Plot Type',
                                   options=['Bar', 'Line'])
-
-    # Granularity radio input
-    plot_resolution = st.sidebar.radio(label='Plot Resolution',
-                                       options=['Yearly', 'Monthly'])
-
-    # Map granularity input to chart resolution
-    if plot_resolution == 'Yearly':
-        resolution = 'Y'
-    elif plot_resolution == 'Monthly':
-        resolution = 'M'
 
     if metric == 'Count':
         grouped_df = activity_data \

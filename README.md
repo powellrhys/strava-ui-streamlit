@@ -66,3 +66,7 @@ In its current state the project has 4 pages:
 - Activities - The data collected displayed in tabular format
 - Heatmap - A control panel enabling the user to customize their activity heatmap
 - Progress - Visualisations of activity progress over the years
+
+#### Home Page
+
+![Screenshot of Home Page](assets/home_page.png?raw=true "Home Page")

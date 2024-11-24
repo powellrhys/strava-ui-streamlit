@@ -31,6 +31,9 @@ def configure_page_config(initial_sidebar_state: str = "expanded",
     if 'activity_data' not in st.session_state:
         st.session_state['logged_in'] = False
 
+    st.logo(image='./assets/strava_text.png',
+            size='small')
+
 
 def login_page() -> None:
 
