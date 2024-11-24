@@ -31,34 +31,7 @@ Data is collected via an input button on the landing page. Therefore, to first c
 
 `streamlit run Home.py`
 
-Before data can be collected the backend server must also be in operation. This can be done by utilising uvicorn. For those using vscode as their IDE, this can be done using the debugger. An example launch.json file can be seen below:
-
-```
-{
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Run Uvicorn",
-        "type": "python",
-        "request": "launch",
-        "module": "uvicorn",
-        "args": [
-          "backend.main:app",
-          "--host",
-          "0.0.0.0",
-          "--port",
-          "5000",
-          "--reload"
-        ],
-        "jinja": true
-      }
-    ]
-  }
-```
-
-Now all requirements have been met, navigate to port 8501 within your browser : 
-
-`https://http://localhost:8501/`
+Data is collected via a github action. To trigger this action from the frontend, a github PAT token is required and should be stored under the `GITHUB_ACCESS_TOKEN` environmental variable. This pipeline stores all necessary data in a azure blob storage account for which an `STORAGE_ACCOUNT_CONNECTION_STRING` and `STORAGE_ACCOUNT_CONTAINER_NAME` are required. To collect data from your own account, a similar setup is required. 
 
 ### Project Overview
 
@@ -81,7 +54,7 @@ The application has been deployed [here](strava-streamlit-frontend.azurewebsites
 
 #### Heatmap Page
 
-![Screenshot of Heatmap Page](assets/heatmap_page.pngraw=true "Heatmap Page")
+![Screenshot of Heatmap Page](assets/heatmap_page.png?raw=true "Heatmap Page")
 
 #### Progress Page
 
