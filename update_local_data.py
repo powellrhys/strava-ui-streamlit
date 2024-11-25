@@ -26,7 +26,7 @@ blob_data = blob_client.download_blob().readall()
 csv_data = StringIO(blob_data.decode('utf-8'))
 df = pd.read_csv(csv_data)
 
-# Create data the directory
+# Create the data directory
 if not os.path.exists('data'):
     os.makedirs('data')
 
