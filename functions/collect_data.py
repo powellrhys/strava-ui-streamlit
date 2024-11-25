@@ -1,5 +1,7 @@
+# Import project dependencies
 from functions.variables import Variables
 
+# Import python dependencies
 from azure.storage.blob import BlobServiceClient
 from io import StringIO
 import pandas as pd
