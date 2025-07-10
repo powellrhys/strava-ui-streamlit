@@ -1,0 +1,20 @@
+# Import python dependencies
+import streamlit as st
+
+def get_navigation() -> st.navigation:
+    """
+    Function to configure application navigation and connections between pages
+
+    Return:
+        nav (st.navigation()): Streamlit navigation object
+    """
+    # Construct pages dictionary
+    pages = [
+        st.Page("pages/home.py", title="Home"),
+        st.Page("pages/activities.py", title="Activity Overview")
+    ]
+
+    # Construct streamlit navigation object
+    nav = st.navigation(pages)
+
+    return nav
