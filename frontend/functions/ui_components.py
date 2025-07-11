@@ -3,8 +3,9 @@ import streamlit as st
 import pandas as pd
 
 # Import project functions
-from functions.data_functions import \
+from functions.data_functions import (
     Variables
+)
 
 def homepage_metrics(activity_data: pd.DataFrame,
                      vars: Variables) -> None:

@@ -3,15 +3,15 @@ import streamlit as st
 
 # Import project dependencies
 from streamlit_components.ui_components import (
-    configure_page_config,
-    data_source_badge
+    configure_page_config
 )
 from functions.data_functions import (
     StravaData,
     Variables
 )
-from functions.ui_components import \
-    homepage_metrics
+from functions.ui_sections import (
+    render_home_page
+)
 
 # Set page config
 configure_page_config(repository_name='play-cricket',
@@ -27,19 +27,10 @@ if not st.user.is_logged_in:
 # Render application if user is logged in
 if st.user.is_logged_in:
 
-    # Define page title and header
-    st.title('STRAVA DASHBOARD')
-    st.header(f'Yearly distance stats to date ({vars.current_year})')
-
+    # Read in activity data from blob storage
     activity_data_df = StravaData(blob_connection_string=vars.blob_connection_string,
                                   container_name='strava',
                                   blob_name='activity_data.csv')
 
-    # Render homepage metrics ui component
-    homepage_metrics(activity_data=activity_data_df.return_dataframe(),
-                     vars=vars)
-
-    # Render data source metadata badge
-    data_source_badge(blob_connection_string=vars.blob_connection_string,
-                      container_name='strava',
-                      file_name='activity_data.csv')
+    # Render home page
+    render_home_page(data=activity_data_df, vars=vars)
