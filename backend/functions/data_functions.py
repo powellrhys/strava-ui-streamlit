@@ -17,34 +17,14 @@ class Variables:
     '''
     def __init__(self):
 
-        # Date related variables
-        self.current_year = dt.date.today().year
-        self.previous_year = dt.date.today().year - 1
-        self.first_activity_date = dt.datetime(2016, 1, 1)
-        self.current_date = dt.datetime(dt.datetime.now().year, 12, 31)
-
         # API related variables
-        self.client_id = os.getenv('CLIENT_ID')
-        self.client_secret = os.getenv('CLIENT_SECRET')
+        self.client_id = os.getenv('client_id')
+        self.client_secret = os.getenv('client_secret')
         self.refresh_token = os.getenv('refresh_token')
-        self.redirect_url = os.getenv('REDIRECT_URI')
 
-        # Storage account varibales
-        self.use_local_storage = eval(os.getenv('USE_LOCAL_STORAGE', str(False)))
-        self.storage_account_conneciton_string = os.getenv('STORAGE_ACCOUNT_CONNECTION_STRING')
-        self.storage_account_container_name = os.getenv('STORAGE_ACCOUNT_CONTAINER_NAME')
+        # Storage account variables
+        self.storage_account_conneciton_string = os.getenv('blob_connection_string')
 
-        # App Login credentials
-        self.login_required = eval(os.getenv('LOGIN_REQUIRED', str(True)))
-        self.app_username = os.getenv('APP_USERNAME')
-        self.app_password = os.getenv('APP_PASSWORD')
-
-        # Strava Login Credentials
-        self.strava_username = os.getenv('STRAVA_USERNAME')
-        self.strava_password = os.getenv('STRAVA_PASSWORD')
-
-        # Selenium variables
-        self.driver_path = os.getenv('DRIVER_PATH', 'chromedriver.exe')
 
 class ApiService:
     """
