@@ -1,3 +1,9 @@
+# secrets.tomt
+.streamlit/secrets.toml
+
+# Github actions app setting.json
+app_settings.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 __pycache__
