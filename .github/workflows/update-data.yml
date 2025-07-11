@@ -31,36 +31,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Spin up FastAPI server
-      - name: Start FastAPI application
-        env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          STORAGE_ACCOUNT_CONNECTION_STRING: ${{ secrets.STORAGE_ACCOUNT_CONNECTION_STRING }}
-        run: |
-          uvicorn backend.main:app --host 0.0.0.0 --port 5000 &
-        shell: bash
-
-      # Configure and install Chrome
-      - name: Set up Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          google-chrome --version
-
-      # Configure ChromeDriver
-      - name: Set up ChromeDriver
-        run: |
-          sudo apt-get install -y chromium-chromedriver
-          chromedriver --version
-
       # Run data collection script
       - name: Run Data Collection Script
+        working-directory: ./backend
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
-          STRAVA_USERNAME: ${{ secrets.STRAVA_USERNAME }}
-          STRAVA_PASSWORD: ${{ secrets.STRAVA_PASSWORD }}
-          DRIVER_PATH: '/usr/bin/chromedriver'
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
         run: |
-          python -m backend.data_collection
+          python collect_data.py
