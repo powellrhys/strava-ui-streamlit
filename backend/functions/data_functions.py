@@ -9,11 +9,19 @@ import os
 load_dotenv()
 
 class Variables:
-    '''
-    Input: None
-    Output: None
-    Class to hold all codebase constants
-    '''
+    """
+    A container class for storing application-wide constants and configuration variables.
+
+    This class loads necessary values such as API credentials and storage connection strings
+    from environment variables during initialization.
+
+    Attributes:
+        client_id (str): The Strava client ID, loaded from the 'client_id' environment variable.
+        client_secret (str): The Strava client secret, loaded from the 'client_secret' environment variable.
+        refresh_token (str): The OAuth refresh token, loaded from the 'refresh_token' environment variable.
+        storage_account_connection_string (str): Azure Blob Storage connection string,
+            loaded from the 'blob_connection_string' environment variable.
+    """
     def __init__(self):
 
         # API related variables
@@ -27,6 +35,10 @@ class Variables:
 
 class ApiService:
     """
+    A service class responsible for managing API authentication credentials.
+
+    Stores the client ID, client secret, and refresh token required to authenticate
+    requests to the API.
     """
     def __init__(
             self,
@@ -34,6 +46,12 @@ class ApiService:
             client_secret: str,
             refresh_token: str) -> None:
         """
+        Initializes the ApiService with the necessary authentication credentials.
+
+        Args:
+            client_id (str): The client ID for API authentication.
+            client_secret (str): The client secret for API authentication.
+            refresh_token (str): The refresh token used to obtain new access tokens.
         """
         self.client_id = client_id
         self.client_secret = client_secret
@@ -41,6 +59,16 @@ class ApiService:
 
     def collect_access_token(self) -> Optional[str]:
         """
+        Refreshes and retrieves a new access token from the Strava API using the refresh token.
+
+        Sends a POST request to Strava's OAuth token endpoint with the stored client credentials
+        and refresh token, then extracts and stores the new access token.
+
+        Returns:
+            Optional[str]: The new access token if the request is successful; otherwise, None.
+
+        Side Effects:
+            Sets the instance attribute `self.access_token` with the newly obtained token.
         """
         response = requests.post('https://www.strava.com/api/v3/oauth/token',
                                  data={
@@ -60,6 +88,18 @@ class ApiService:
             per_page: int = 200,
             page: int = 1) -> list:
         """
+        Retrieves a list of athlete activities from the Strava API.
+
+        Fetches activities for the authenticated user, with optional pagination support.
+
+        Args:
+            access_token (Optional[str]): The access token for authorization. If None,
+                                        uses the instance's stored access token.
+            per_page (int): Number of activities to retrieve per page (default is 200).
+            page (int): Page number to retrieve (default is 1).
+
+        Returns:
+            list: A list of activity records represented as dictionaries.
         """
         if access_token is None:
             access_token = self.access_token
@@ -85,6 +125,18 @@ class ApiService:
             access_token: Optional[str] = None,
             per_page: int = 200) -> list:
         """
+        Retrieves all athlete activity data from the Strava API by paginating through results.
+
+        This method continuously fetches activity data page by page until no more activities
+        are returned, aggregating all results into a single list.
+
+        Args:
+            access_token (Optional[str]): The access token for API authorization. If None,
+                                        the instance's stored access token will be used.
+            per_page (int): Number of activities to retrieve per API request (default is 200).
+
+        Returns:
+            list: A complete list of all activity records retrieved from the API.
         """
         if access_token is None:
             access_token = self.access_token
@@ -114,6 +166,17 @@ class ApiService:
             container: str,
             output_filename: str) -> None:
         """
+        Exports activity data to a CSV file and uploads it to Azure Blob Storage.
+
+        Processes the list of activity dictionaries into a pandas DataFrame, selects
+        relevant columns, cleans up the map polyline data, converts the DataFrame
+        to CSV format, and uploads the CSV to the specified Azure Blob Storage container.
+
+        Args:
+            data (list): A list of activity data dictionaries to export.
+            vars (Variables): An instance of the Variables class containing storage account credentials.
+            container (str): The name of the Azure Blob Storage container where the file will be uploaded.
+            output_filename (str): The name of the output CSV file in the blob storage.
         """
         # Generate pandas dataframe from data collected
         df = pd.DataFrame(data)

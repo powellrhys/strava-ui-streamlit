@@ -31,4 +31,5 @@ if st.user.is_logged_in:
                                   container_name='strava',
                                   blob_name='activity_data.csv')
 
+    # Render activity overview section
     render_activity_overview(data=activity_data_df, vars=vars)

@@ -4,11 +4,18 @@ import requests
 def exchange_code_for_token(client_id: str,
                             client_secret: str,
                             code: str) -> Optional[str]:
-    '''
-    Input: Client ID, Client Secret, auth code
-    Output: Function to retrieve access token
-    Function to fetch access token
-    '''
+    """
+    Exchanges an authorization code for an access token using Strava's OAuth API.
+
+    Parameters:
+        client_id (str): The application's client ID provided by Strava.
+        client_secret (str): The application's client secret provided by Strava.
+        code (str): The authorization code received from the Strava authorization redirect.
+
+    Returns:
+        Optional[str]: The access token as a JSON string if the exchange is successful,
+                       otherwise None.
+    """
     # Define token url
     token_url = "https://www.strava.com/api/v3/oauth/token"
 

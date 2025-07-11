@@ -9,11 +9,21 @@ from functions.data_functions import (
 
 def homepage_metrics(activity_data: pd.DataFrame,
                      vars: Variables) -> None:
-    '''
-    Input: Activity data and variables object
-    Output: Homepage metrics component
-    Function to generate homepage mentrics component
-    '''
+    """
+    Generates and displays a homepage metrics component in Streamlit summarizing
+    activity data over the current and previous years for selected activity types.
+
+    The function calculates the total distance (in kilometers) and number of entries
+    for each activity type ('Run', 'Ride', 'Swim', 'Golf', 'Walk') across two years,
+    then visualizes the current year's distance along with the difference compared
+    to the previous year using Streamlit metric components.
+
+    Args:
+        activity_data (pd.DataFrame): DataFrame containing Strava activity data,
+            expected to have 'type', 'start_date', and 'distance' columns.
+        vars (Variables): An instance containing date-related variables such as current
+            and previous year.
+    """
     # Define activity types of interest
     activity_types = ['Run', 'Ride', 'Swim', 'Golf', 'Walk']
     activity_data['start_date'] = pd.to_datetime(activity_data['start_date'], errors='coerce')

@@ -27,6 +27,19 @@ def render_home_page(
     vars: Variables
 ) -> None:
     """
+    Renders the main dashboard page in Streamlit displaying Strava activity statistics.
+
+    This function sets the page title and header, shows yearly distance metrics
+    by calling the `homepage_metrics` function, and displays a data source badge
+    indicating metadata about the activity data file stored in Azure Blob Storage.
+
+    Args:
+        data (StravaData): An instance containing Strava activity data and related methods.
+        vars (Variables): An instance containing configuration variables, including current year and storage
+            credentials.
+
+    Side Effects:
+        Renders Streamlit UI components on the page.
     """
     # Define page title and header
     st.title('STRAVA DASHBOARD')
@@ -46,6 +59,26 @@ def render_activity_overview(
     vars: Variables
 ) -> None:
     """
+    Renders the "Activity Overview" page in Streamlit with interactive filters and
+    displays a filtered and formatted table of Strava activity data.
+
+    The page includes:
+    - A metadata badge showing data source information.
+    - A date range slider to filter activities by start date.
+    - A multiselect box to filter activities by type.
+    - Data transformations such as distance conversion, datetime formatting,
+      moving time formatting, and column renaming.
+    - A dynamic table showing the filtered and formatted activity data.
+
+    Args:
+        data (StravaData): An instance containing Strava activity data and methods
+            for filtering and transformation.
+        vars (Variables): An instance containing configuration variables such as
+            date boundaries and storage credentials.
+
+    Side Effects:
+        - Renders Streamlit UI components (slider, multiselect, dataframe, badges).
+        - Modifies `data.df` in-place via filtering and data transformations.
     """
     # Define page title
     st.title('Activity Overview')
@@ -108,6 +141,24 @@ def render_heatmap(
     data: StravaData
 ) -> None:
     """
+    Renders the Heatmap page in Streamlit, allowing users to filter activities by type
+    and date range, generate an interactive heatmap of activity routes, and download
+    the heatmap as an HTML file.
+
+    Features include:
+    - Multi-select filter for activity types.
+    - Date inputs for selecting start and end dates.
+    - Button to generate the heatmap based on current filters.
+    - Download button enabled once the heatmap is generated.
+    - Feedback messages and loading spinner during heatmap generation.
+
+    Args:
+        data (StravaData): An instance containing Strava activity data and filtering methods.
+
+    Side Effects:
+        - Modifies `data.df` via filtering methods.
+        - Updates Streamlit session state with generated heatmap HTML.
+        - Reruns the app after heatmap generation to refresh UI components.
     """
     # Define Page Header
     st.title('Heatmap')
@@ -166,6 +217,25 @@ def render_progress_page(
     data: StravaData
 ) -> None:
     """
+    Renders the Progress Overview page in Streamlit, providing interactive controls
+    to visualize Strava activity metrics over time.
+
+    Features include:
+    - Conversion of distances from meters to kilometers.
+    - Multi-select input to filter activities by type.
+    - Selection between bar and line chart types.
+    - Choice of metric to visualize (e.g., Distance, Count, Kudos Count, Total Elevation Gain, Moving Time).
+    - Plot resolution selector (Yearly or Monthly) affecting aggregation and date slider format.
+    - Date range slider to filter data temporally.
+    - Aggregation and filtering of activity data based on user inputs.
+    - Visualization rendered using Plotly, displayed in the Streamlit app.
+
+    Args:
+        data (StravaData): An instance containing Strava activity data and data manipulation methods.
+
+    Side Effects:
+        - Modifies `data.df` in-place (distance conversion).
+        - Renders multiple Streamlit UI components and interactive plots.
     """
     data.convert_distance_into_km(column_name='distance')
     # Convert distance from meters to kilometers
