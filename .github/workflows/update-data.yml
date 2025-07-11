@@ -36,7 +36,7 @@ jobs:
         working-directory: ./backend
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
         run: |
           python collect_data.py
