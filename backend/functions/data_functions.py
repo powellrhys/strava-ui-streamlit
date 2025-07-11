@@ -2,7 +2,6 @@ from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
 from typing import Optional
 from io import StringIO
-import datetime as dt
 import pandas as pd
 import requests
 import os
