@@ -38,5 +38,6 @@ jobs:
           client_id: ${{ secrets.CLIENT_ID }}
           client_secret: ${{ secrets.CLIENT_SECRET }}
           refresh_token: ${{ secrets.REFRESH_TOKEN }}
+          blob_connection_string: ${{ secrets.BLOB_CONNECTION_STRING }}
         run: |
           python collect_data.py
