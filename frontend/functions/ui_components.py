@@ -9,6 +9,13 @@ from functions.data_functions import (
 
 def render_page_logo() -> None:
     """
+    Displays the application logo at the top of the Streamlit page.
+
+    This function uses Streamlit's `st.logo()` method to render a logo
+    image from the specified path. The logo is displayed in a large size.
+
+    Returns:
+        None
     """
     st.logo(image='./assets/strava_text.png',
             size='large')

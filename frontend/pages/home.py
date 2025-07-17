@@ -13,7 +13,7 @@ from functions.ui_components import (
     render_page_logo
 )
 from functions.ui_sections import (
-    render_home_page,
+    render_home_page
 )
 
 # Set page config
