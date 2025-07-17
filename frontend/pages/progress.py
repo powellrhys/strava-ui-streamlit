@@ -9,6 +9,9 @@ from functions.data_functions import (
     StravaData,
     Variables
 )
+from functions.ui_components import (
+    render_page_logo
+)
 from functions.ui_sections import (
     render_progress_page
 )
@@ -26,6 +29,9 @@ if not st.user.is_logged_in:
 
 # Render application if user is logged in
 if st.user.is_logged_in:
+
+    # Render page logo
+    render_page_logo()
 
     activity_data_df = StravaData(blob_connection_string=vars.blob_connection_string,
                                   container_name='strava',
