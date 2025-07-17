@@ -1,12 +1,11 @@
 # Backend
 polyline==2.0.2
-pandas==2.2.3
 
 # Frontend
 streamlit==1.46.0
 Authlib==1.5.1
 folium==0.18.0
-
+pandas==2.2.3
 
 # Shared
 azure-storage-blob==12.24.0

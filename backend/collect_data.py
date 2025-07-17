@@ -34,7 +34,7 @@ logger.info("Api service configured \n")
 
 # Collect access token to hit api
 logger.info("Collecting access token...")
-tk = app.collect_access_token()
+app.collect_access_token()
 logger.info("Access token collected \n")
 
 # Collect activity data
