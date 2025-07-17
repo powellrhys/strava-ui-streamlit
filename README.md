@@ -29,16 +29,16 @@ The application has been deployed twice:
 
 #### Home Page
 
-<!-- ![Screenshot of Home Page](docs/assets/home_page.png?raw=true "Home Page") -->
+![Screenshot of Home Page](docs/assets/home_page.png?raw=true "Home Page")
 
 #### Activities Page
 
-<!-- ![Screenshot of Activity Page](docs/assets/activities_page.png?raw=true "Activity Page") -->
+![Screenshot of Activity Page](docs/assets/activities_page.png?raw=true "Activity Page")
 
 #### Heatmap Page
 
-<!-- ![Screenshot of Heatmap Page](docs/assets/heatmap_page.png?raw=true "Heatmap Page") -->
+![Screenshot of Heatmap Page](docs/assets/heatmap_page.png?raw=true "Heatmap Page")
 
 #### Progress Page
 
-<!-- ![Screenshot of Progress Page](docs/assets/progress_page.png?raw=true "Progress Page") -->
+![Screenshot of Progress Page](docs/assets/progress_page.png?raw=true "Progress Page")

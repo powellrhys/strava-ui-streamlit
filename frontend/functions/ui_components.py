@@ -7,6 +7,12 @@ from functions.data_functions import (
     Variables
 )
 
+def render_page_logo() -> None:
+    """
+    """
+    st.logo(image='./assets/strava_text.png',
+            size='large')
+
 def homepage_metrics(activity_data: pd.DataFrame,
                      vars: Variables) -> None:
     """
@@ -60,6 +66,6 @@ def homepage_metrics(activity_data: pd.DataFrame,
         # Render metric components
         with columns[i]:
             st.metric(label=activity_types[i],
-                      value=f"{round(data[activity_types[i]][2024]['distance'], 2)} km",
+                      value=f"{round(data[activity_types[i]][int(vars.current_year)]['distance'], 2)} km",
                       delta=f"{round(diff, 2)} km"
                       )
