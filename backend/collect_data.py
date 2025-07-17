@@ -27,18 +27,25 @@ logger.info("Configuring API service application...")
 app = ApiService(
     client_id=vars.client_id,
     client_secret=vars.client_secret,
-    refresh_token=vars.refresh_token
+    refresh_token=vars.refresh_token,
+    logger=logger
 )
 logger.info("Api service configured \n")
 
+# Collect access token to hit api
 logger.info("Collecting access token...")
-app.collect_access_token()
+tk = app.collect_access_token()
 logger.info("Access token collected \n")
 
-# logger.info("Collecting activity data...")
-# app.collect_all_activity_data()
-# logger.info("Activity Data collected \n")
+# Collect activity data
+logger.info("Collecting activity data...")
+data = app.collect_all_activity_data()
+logger.info("Activity Data collected \n")
 
-# logger.info("Exporting data...")
-# app.collect_access_token()
-# logger.info("Data exported to blob storage \n")
+# Export data to blob storage
+logger.info("Exporting data...")
+app.export_activity_data(data=data,
+                         vars=vars,
+                         container='strava',
+                         output_filename='activity_data.csv')
+logger.info("Data exported to blob storage \n")

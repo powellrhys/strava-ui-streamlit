@@ -4,6 +4,7 @@ from typing import Optional
 from io import StringIO
 import pandas as pd
 import requests
+import logging
 import os
 
 load_dotenv()
@@ -44,7 +45,8 @@ class ApiService:
             self,
             client_id: str,
             client_secret: str,
-            refresh_token: str) -> None:
+            refresh_token: str,
+            logger: logging.Logger) -> None:
         """
         Initializes the ApiService with the necessary authentication credentials.
 
@@ -56,6 +58,7 @@ class ApiService:
         self.client_id = client_id
         self.client_secret = client_secret
         self.refresh_token = refresh_token
+        self.logger = logger
 
     def collect_access_token(self) -> Optional[str]:
         """
@@ -144,6 +147,7 @@ class ApiService:
         data = []
         page_data = ['']
         while len(page_data) > 0:
+            self.logger.info(f'Collecting data from page: {page}')
 
             # Fetch data for specific page
             page_data = self.get_activity_data(
