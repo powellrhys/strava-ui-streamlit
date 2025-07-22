@@ -39,13 +39,26 @@ logger.info("Access token collected \n")
 
 # Collect activity data
 logger.info("Collecting activity data...")
-data = app.collect_all_activity_data()
+activity_data = app.collect_all_activity_data()
 logger.info("Activity Data collected \n")
 
-# Export data to blob storage
+# Filter out activity data
+logger.info("Filter out coastal path activities...")
+costal_path_data = app.filter_out_coastal_path_data(activity_data=activity_data)
+logger.info("Coastal path data filtered out \n")
+
+# Export activity data to blob storage
 logger.info("Exporting data...")
-app.export_activity_data(data=data,
+app.export_activity_data(data=activity_data,
                          vars=vars,
                          container='strava',
                          output_filename='activity_data.csv')
+logger.info("Data exported to blob storage \n")
+
+# Export coastal path data to blob storage
+logger.info("Exporting data...")
+app.export_activity_data(data=costal_path_data,
+                         vars=vars,
+                         container='strava',
+                         output_filename='coastal_path_data.csv')
 logger.info("Data exported to blob storage \n")

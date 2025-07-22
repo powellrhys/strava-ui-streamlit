@@ -163,6 +163,16 @@ class ApiService:
 
         return data
 
+    def filter_out_coastal_path_data(
+            self,
+            activity_data: pd.DataFrame) -> list:
+        """
+        """
+        # Filter out coastal path data based on WCP tag in activity name
+        coastal_path_data = [data for data in activity_data if 'WCP' in data['name']]
+
+        return coastal_path_data
+
     def export_activity_data(
             self,
             data: list,
@@ -195,8 +205,7 @@ class ApiService:
                  'kudos_count',
                  'comment_count',
                  'athlete_count',
-                 'map',
-                 'average_watts']]
+                 'map']]
 
         # Clean up polyline data from map column in dataframe
         df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
