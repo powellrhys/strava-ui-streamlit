@@ -342,6 +342,22 @@ def render_costal_path_page(
     data: StravaData
 ) -> None:
     """
+    Renders the Coastal Path Heatmap page using Streamlit.
+
+    This function:
+    - Sets the page title to 'Coastal Path Heatmap'
+    - Generates a heatmap based on the provided Strava data
+    - Writes the heatmap HTML to a session state buffer
+    - Displays a download button to export the heatmap as an HTML file
+
+    Parameters:
+    ----------
+    data : StravaData
+        A structured object containing Strava activity data used to generate the heatmap.
+
+    Returns:
+    -------
+    None
     """
     # Render Page title
     st.title('Coastal Path Heatmap')

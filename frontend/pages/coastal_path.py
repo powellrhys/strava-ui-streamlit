@@ -28,10 +28,6 @@ vars = Variables()
 if not st.user.is_logged_in:
     st.login('auth0')
 
-# Configure page initial state
-if 'download_disabled' not in st.session_state:
-    st.session_state.download_disabled = True
-
 if 'buffer' not in st.session_state:
     st.session_state.buffer = io.BytesIO()
 
