@@ -10,6 +10,9 @@ from functions.data_functions import (
     StravaData,
     Variables
 )
+from functions.ui_components import (
+    render_page_logo
+)
 from functions.ui_sections import (
     render_heatmap
 )
@@ -34,6 +37,9 @@ if 'buffer' not in st.session_state:
 
 # Render application if user is logged in
 if st.user.is_logged_in:
+
+    # Render page logo
+    render_page_logo()
 
     # Read in activity data from blob storage
     activity_data_df = StravaData(blob_connection_string=vars.blob_connection_string,

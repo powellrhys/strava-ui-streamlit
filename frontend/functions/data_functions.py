@@ -193,3 +193,56 @@ def generate_heatmap(
 
     # Make download available
     st.session_state.download_disabled = False
+
+def generate_coastal_path_heatmap(
+    data: StravaData
+) -> folium.Map._repr_html_:
+    """
+    Generates an interactive Folium heatmap of Strava activities along the coastal path.
+
+    This function:
+    - Converts the provided StravaData object into a list of activity records
+    - Initializes a Folium map centered on Wales
+    - Plots each activity's GPS polyline onto the map with a tooltip of its name
+    - Enables fullscreen map functionality
+    - Returns the HTML representation of the rendered map
+
+    Parameters:
+    ----------
+    data : StravaData
+        An object that provides access to Strava activity data, including encoded polylines.
+
+    Returns:
+    -------
+    folium.Map._repr_html_
+        An HTML string representing the rendered heatmap for embedding or display.
+    """
+    # Convert dataframe into list of dictionaries
+    activity_data = data.return_dataframe().to_dict(orient='records')
+
+    # Generate folium map object
+    m = folium.Map(tiles='cartodb positron',
+                   location=[52.4837, -3.5],
+                   zoom_start=7)
+
+    # Iterate through activities
+    for activity in activity_data:
+
+        # Collect and decode activity polyline
+        curve = activity["map"]
+        data = polyline.decode(curve)
+
+        # Plot gps data on map object
+        folium.PolyLine(data,
+                        color='#fc4c02',
+                        weight=2,
+                        opacity=1,
+                        tooltip=activity['name']).add_to(m)
+
+    # Add full screen functionality to folium object
+    Fullscreen(position="topleft").add_to(m)
+
+    # Convert to html format
+    map_html = m._repr_html_()
+
+    return map_html

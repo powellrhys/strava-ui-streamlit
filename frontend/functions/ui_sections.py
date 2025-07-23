@@ -11,6 +11,7 @@ from streamlit_components.ui_components import (
     data_source_badge
 )
 from functions.data_functions import (
+    generate_coastal_path_heatmap,
     generate_heatmap,
     StravaData,
     Variables
@@ -336,3 +337,42 @@ def render_progress_page(
 
     # Illustrate figure
     st.plotly_chart(fig)
+
+def render_costal_path_page(
+    data: StravaData
+) -> None:
+    """
+    Renders the Coastal Path Heatmap page using Streamlit.
+
+    This function:
+    - Sets the page title to 'Coastal Path Heatmap'
+    - Generates a heatmap based on the provided Strava data
+    - Writes the heatmap HTML to a session state buffer
+    - Displays a download button to export the heatmap as an HTML file
+
+    Parameters:
+    ----------
+    data : StravaData
+        A structured object containing Strava activity data used to generate the heatmap.
+
+    Returns:
+    -------
+    None
+    """
+    # Render Page title
+    st.title('Coastal Path Heatmap')
+
+    # Generate coastal path heatmap
+    map = generate_coastal_path_heatmap(data=data)
+
+    # Update buffer variable with folium object
+    st.session_state.buffer.write(map.encode())
+    st.session_state.buffer.seek(0)
+
+    # Render Download Heatmap Button
+    st.download_button(
+        label="Download Heatmap",
+        data=st.session_state.buffer,
+        file_name='heatmap.html',
+        mime="text/html"
+    )

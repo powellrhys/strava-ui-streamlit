@@ -27,18 +27,23 @@ The application has been deployed twice:
 - [Azure](https://strava-streamlit-frontend.azurewebsites.net/)
 - [Streamlit Cloud](https://strava-streamlit-frontend.streamlit.app/)
 
-#### Home Page
 
-<!-- ![Screenshot of Home Page](docs/assets/home_page.png?raw=true "Home Page") -->
+### Home Page
 
-#### Activities Page
+![Screenshot of Home Page](docs/assets/home_page.png?raw=true "Home Page")
 
-<!-- ![Screenshot of Activity Page](docs/assets/activities_page.png?raw=true "Activity Page") -->
+### Activities Page
 
-#### Heatmap Page
+![Screenshot of Activity Page](docs/assets/activities_page.png?raw=true "Activity Page")
 
-<!-- ![Screenshot of Heatmap Page](docs/assets/heatmap_page.png?raw=true "Heatmap Page") -->
+### Heatmap Page
 
-#### Progress Page
+![Screenshot of Heatmap Page](docs/assets/heatmap_page.png?raw=true "Heatmap Page")
 
-<!-- ![Screenshot of Progress Page](docs/assets/progress_page.png?raw=true "Progress Page") -->
+### Progress Page
+
+![Screenshot of Progress Page](docs/assets/progress_page.png?raw=true "Progress Page")
+
+### Coastal Path Page
+
+![Screenshot of Coastal Path Page](docs/assets/coastal_path_page.png?raw=true "Coastal Path Page")
