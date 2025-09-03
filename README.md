@@ -25,7 +25,7 @@ Given the private nature of the data, access to the application is limited and i
 The application has been deployed twice:
 
 - [Azure](https://strava-streamlit-frontend.azurewebsites.net/)
-- [Streamlit Cloud](https://strava-streamlit-frontend.streamlit.app/)
+- [Streamlit Cloud](https://strava-frontend.streamlit.app/)
 
 
 ### Home Page
