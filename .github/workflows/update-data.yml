@@ -3,12 +3,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * 0"
-  push:
-    paths:
-      - 'backend/**'
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - 'backend/**'
+  push:
+    branches:
+      - main
 
 jobs:
   Update-Data:
