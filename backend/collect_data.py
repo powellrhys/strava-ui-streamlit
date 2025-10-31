@@ -1,12 +1,7 @@
-# Import python dependencies
+# Import dependencies
+from backend.functions.data_functions import ApiService, Variables
 import warnings
 import logging
-
-# Import project dependencies
-from functions.data_functions import (
-    ApiService,
-    Variables
-)
 
 # Ignore warnings
 warnings.filterwarnings("ignore")
