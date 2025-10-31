@@ -1,14 +1,8 @@
-# Import python dependencies
+# Import dependencies
+from backend.functions.authentication import exchange_code_for_token
+from backend.functions.data_functions import Variables
 import urllib.parse
 import webbrowser
-
-# Import project dependencies
-from functions.data_functions import (
-    Variables
-)
-from functions.authentication import (
-    exchange_code_for_token
-)
 
 # Import project variables
 vars = Variables()
