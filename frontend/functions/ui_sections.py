@@ -386,7 +386,7 @@ def render_costal_path_page(data: StravaData) -> None:
 
     with columns[1]:
         st.metric(label="Percentage of coastal path covered",
-                  value=f"{format(wcp_distance * 100 / 1400, ",.2f")} %",
+                  value=f'{format(wcp_distance * 100 / 1400, ",.2f")} %',
                   border=True)
 
     with st.container(border=True):
