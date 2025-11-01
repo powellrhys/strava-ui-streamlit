@@ -1,27 +1,19 @@
-# Import python dependencies
-import streamlit as st
-import pandas as pd
-import datetime
-
-# Import project dependencies
-from streamlit_components.plot_functions import (
-    PlotlyPlotter
-)
-from streamlit_components.ui_components import (
-    data_source_badge
-)
+# Import dependencies
+from streamlit_components.ui_components import data_source_badge
+from streamlit_components.plot_functions import PlotlyPlotter
+from functions.ui_components import homepage_metrics
+from functions.mapping import activity_df_column_map
 from functions.data_functions import (
     generate_coastal_path_heatmap,
+    sum_coastal_path_distance,
     generate_heatmap,
     StravaData,
     Variables
 )
-from functions.ui_components import (
-    homepage_metrics
-)
-from functions.mapping import (
-    activity_df_column_map
-)
+import plotly.express as px
+import streamlit as st
+import pandas as pd
+import datetime
 
 def render_home_page(
     data: StravaData,
@@ -321,6 +313,29 @@ def render_progress_page(
     grouped_df = grouped_df[
         (grouped_df['start_date'] >= date_range[0]) & (grouped_df['start_date'] <= date_range[1])]
 
+    # Collect a unique list of activity types
+    unique_types = grouped_df['type'].unique()
+
+    # Handle colour mapping logic
+    # Case 1: Only one type
+    if len(unique_types) == 1:
+        color_discrete_sequence = ["#fc4c02"]
+
+    # Case 2: Multiple types — keep "Run" orange, let Plotly handle the rest
+    else:
+        # Get Plotly’s default color palette
+        default_colors = px.colors.qualitative.Plotly
+
+        # Move "#fc4c02" (Run color) to the front, then fill in others
+        color_discrete_sequence = []
+        if "Run" in unique_types:
+            color_discrete_sequence.append("#fc4c02")
+
+        # Fill remaining types with default colors (excluding the orange if already added)
+        remaining_colors = [c for c in default_colors if c.lower() != "#fc4c02"]
+        color_discrete_sequence.extend(remaining_colors)
+
+    # Generate plotly plotter object
     plt = PlotlyPlotter(df=grouped_df,
                         x='start_date',
                         y=metric.lower().replace(' ', '_'),
@@ -328,8 +343,10 @@ def render_progress_page(
                         labels={'start_date': 'Date',
                                 'type': 'Activity Type',
                                 metric.lower().replace(' ', '_'): metric},
+                        color_discrete_sequence=color_discrete_sequence,
                         title=f'{plot_resolution} {metric} by Type')
 
+    # Handle which plot to plot
     if chart_type == 'Bar':
         fig = plt.plot_bar()
     if chart_type == 'Line':
@@ -338,9 +355,7 @@ def render_progress_page(
     # Illustrate figure
     st.plotly_chart(fig)
 
-def render_costal_path_page(
-    data: StravaData
-) -> None:
+def render_costal_path_page(data: StravaData) -> None:
     """
     Renders the Coastal Path Heatmap page using Streamlit.
 
@@ -361,6 +376,28 @@ def render_costal_path_page(
     """
     # Render Page title
     st.title('Coastal Path Heatmap')
+
+    wcp_distance, distance_per_year_df = sum_coastal_path_distance(data=data)
+
+    columns = st.columns(2)
+
+    with columns[0]:
+        st.metric(label="Total Coastal Path Distance Covered", value=f"{wcp_distance} km", border=True)
+
+    with columns[1]:
+        st.metric(label="Percentage of coastal path covered",
+                  value=f"{format(wcp_distance * 100 / 1400, ",.2f")} %",
+                  border=True)
+
+    with st.container(border=True):
+        st.plotly_chart(
+            PlotlyPlotter(
+                df=distance_per_year_df,
+                x='year',
+                y="wcp_value",
+                labels={"year": "Year", "wcp_value": "Distance (km)"},
+                color_discrete_sequence=["#fc4c02"],
+                title="Breakdown of Welsh Coastal Path Progress").plot_bar())
 
     # Generate coastal path heatmap
     map = generate_coastal_path_heatmap(data=data)
