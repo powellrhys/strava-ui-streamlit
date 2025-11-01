@@ -3,11 +3,13 @@ from streamlit_components.data_functions import (
     BlobData
 )
 from folium.plugins import Fullscreen
+from typing import Tuple
 import streamlit as st
 import datetime as dt
 import pandas as pd
 import polyline
 import folium
+
 
 class Variables:
     """
@@ -246,3 +248,42 @@ def generate_coastal_path_heatmap(
     map_html = m._repr_html_()
 
     return map_html
+
+def sum_coastal_path_distance(data: StravaData) -> Tuple[float, pd.DataFrame]:
+    """
+    Extract and sum Welsh Coastal Path (WCP) distances from Strava activity data.
+
+    Looks for patterns like "[WCP - X]" in activity names, where X is a distance value.
+    Returns the total distance and a yearly summary based on activity start dates.
+
+    Parameters
+    ----------
+    data : StravaData
+        A StravaData object with 'name' and 'start_date' fields.
+
+    Returns
+    -------
+    total_distance : float
+        Total summed WCP distance.
+    distance_per_year : pandas.DataFrame
+        Yearly totals of WCP distance.
+    """
+    # Return dataframe from StravaData object
+    df = data.return_dataframe()
+
+    # Use regex to extract the number after 'WCP - ' and before ']'
+    df['wcp_value'] = df['name'].str.extract(r'\[WCP\s*-\s*([\d.]+)\]', expand=False)
+
+    # Convert to numeric (in case some are NaN or strings)
+    df['wcp_value'] = pd.to_numeric(df['wcp_value'], errors='coerce')
+
+    # Make sure start_date is a datetime
+    df['start_date'] = pd.to_datetime(df['start_date'])
+
+    # Extract the year from the start date
+    df['year'] = df['start_date'].dt.year
+
+    # Group by year and sum the distance
+    distance_per_year = df.groupby('year')['wcp_value'].sum().reset_index()
+
+    return float(df['wcp_value'].sum()), distance_per_year
