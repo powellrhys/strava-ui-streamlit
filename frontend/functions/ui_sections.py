@@ -377,18 +377,23 @@ def render_costal_path_page(data: StravaData) -> None:
     # Render Page title
     st.title('Coastal Path Heatmap')
 
+    # Aggregate coastal path data
     wcp_distance, distance_per_year_df = sum_coastal_path_distance(data=data)
 
+    # Define column object
     columns = st.columns(2)
 
+    # Render total distance metric in first column
     with columns[0]:
         st.metric(label="Total Coastal Path Distance Covered", value=f"{wcp_distance} km", border=True)
 
+    # Render percentage of coastal path covered in final column
     with columns[1]:
         st.metric(label="Percentage of coastal path covered",
                   value=f'{format(wcp_distance * 100 / 1400, ",.2f")} %',
                   border=True)
 
+    # Render bar plot of distance covered every year within streamlit container object
     with st.container(border=True):
         st.plotly_chart(
             PlotlyPlotter(
