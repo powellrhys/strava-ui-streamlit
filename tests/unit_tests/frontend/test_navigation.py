@@ -1,19 +1,23 @@
 # Import dependencies
-import unittest
-from unittest.mock import patch, MagicMock
 from frontend.functions.navigation import get_navigation
+from unittest.mock import patch, MagicMock
+import unittest
 
 class TestGetNavigation(unittest.TestCase):
 
     @patch('frontend.functions.navigation.st')
     def test_get_navigation(self, mock_st):
+        """
+        Test to inspect the behaviour of the frontend navigation
+        """
         # Mock st.Page and st.navigation
-        # mock_page = MagicMock(name='Page')
         mock_nav = MagicMock(name='navigation')
 
+        # Mock effects
         mock_st.Page.side_effect = lambda path, title: {'path': path, 'title': title}
         mock_st.navigation.return_value = mock_nav
 
+        # Call function
         result = get_navigation()
 
         # Verify st.Page was called with expected arguments
@@ -25,6 +29,7 @@ class TestGetNavigation(unittest.TestCase):
             (("pages/coastal_path.py",), {'title': "Coastal Path"}),
         ]
 
+        # Assertions
         actual_calls = mock_st.Page.call_args_list
         self.assertEqual(len(actual_calls), len(expected_calls))
         for actual, expected in zip(actual_calls, expected_calls):
