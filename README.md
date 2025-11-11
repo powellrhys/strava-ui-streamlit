@@ -16,7 +16,8 @@
 
 ### Codebase Coverage
 
-In Progress....
+[![codecov](https://codecov.io/gh/powellrhys/strava-ui-streamlit/graph/badge.svg?token=5GHA73NUGU)](https://codecov.io/gh/powellrhys/strava-ui-streamlit)
+![GitHub issues](https://img.shields.io/github/issues/powellrhys/strava-ui-streamlit.svg)
 
 ### Codebase structure
 
@@ -59,7 +60,7 @@ and provides interactive dashboards to explore your performance over time.
 - Easily reproducible and extensible setup for deployment or migration.  
 
 ## Testing
-- In Progress...
+- **Pytest** for unit and integration testing to ensure code reliability. 
 
 
 ## Deployment
