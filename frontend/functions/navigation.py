@@ -9,13 +9,20 @@ def get_navigation() -> st.navigation:
         nav (st.navigation()): Streamlit navigation object
     """
     # Construct pages dictionary
-    pages = [
-        st.Page("pages/home.py", title="Home"),
-        st.Page("pages/activities.py", title="Activity Overview"),
-        st.Page("pages/heatmap.py", title="Strava Heatmap"),
-        st.Page("pages/progress.py", title="Progress Overview"),
-        st.Page("pages/coastal_path.py", title='Coastal Path')
-    ]
+    pages = {
+        "Overview": [
+            st.Page(page="pages/home.py", title="Home"),
+            st.Page("pages/activities.py", title="Activity Overview"),
+            st.Page("pages/progress.py", title="Progress Overview"),
+        ],
+        "HeatMap": [
+            st.Page("pages/heatmap.py", title="Strava Heatmap"),
+            st.Page("pages/coastal_path.py", title='Coastal Path'),
+        ],
+        "Running": [
+            st.Page("pages/pb_efforts.py", title="PB Efforts Overview"),
+        ]
+    }
 
     # Construct streamlit navigation object
     nav = st.navigation(pages)
