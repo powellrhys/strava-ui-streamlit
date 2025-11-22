@@ -188,12 +188,99 @@ class ApiService:
 
         return coastal_path_data
 
-    def export_activity_data(
-            self,
-            data: list,
-            vars: Variables,
-            container: str,
-            output_filename: str) -> None:
+    def collect_pb_effort_activities(self, activity_data: list, access_token: Optional[str] = None) -> pd.DataFrame:
+        """
+        Extract personal-best effort activities from Strava activity data and return them as a DataFrame.
+
+        Filters activities matching target distances (5km, 10km, HM), fetches full
+        activity details from the Strava API, extracts key fields, and compiles the
+        results into a pandas DataFrame.
+
+        Parameters
+        ----------
+        activity_data : list
+            List of activity metadata dictionaries.
+        access_token : str, optional
+            Strava API access token; defaults to the instance token.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing filtered PB effort activity details.
+        """
+        # Collect pb effort activity ids
+        pb_efforts_ids = [k['id'] for k in activity_data
+                          if any(dist in k['name'] for dist in ['[5km]', '[10km]', '[HM]'])]
+
+        # Manage access token
+        if access_token is None:
+            access_token = self.access_token
+
+        # Define request header
+        header = {'Authorization': 'Bearer ' + access_token}
+
+        # Iterate through each pb effort activity
+        pb_effort_data = []
+        for activity_id in pb_efforts_ids:
+            # Define activity url
+            activities_url = f"https://www.strava.com/api/v3/activities/{activity_id}"
+
+            # Execute request
+            data = requests.get(
+                url=activities_url,
+                headers=header,
+            ).json()
+
+            # Fetch official time from data
+            data["time"] = data['description'].split("[")[-1].split("]")[0].split(" - ")[-1]
+
+            # Filter down data to keys of interest
+            keys_to_keep = {"id", "name", "start_date", "time"}
+            filtered_data = {k: data[k] for k in keys_to_keep if k in data}
+
+            # Append activity data to list
+            pb_effort_data.append(filtered_data)
+
+        return pd.DataFrame(pb_effort_data)
+
+    def export_data_as_csv(self, df: pd.DataFrame, vars: Variables, container: str, output_filename: str) -> None:
+        """
+        Export a pandas DataFrame as a CSV file to an Azure Blob Storage container.
+
+        This method converts the provided DataFrame into an in-memory CSV string,
+        connects to the Azure Blob Storage account specified in `vars`, and uploads
+        the CSV content to the designated container and blob path.
+
+        Parameters:
+            df : pd.DataFrame
+                The DataFrame to be exported as a CSV file.
+            vars : Variables
+                An object containing configuration values, including the Azure Storage
+                account connection string.
+            container : str
+                The name of the Azure Blob Storage container where the file will be uploaded.
+            output_filename : str
+                The name (including path, if applicable) of the CSV file to create in the blob container.
+
+        Returns: None (This method performs an upload and does not return a value.)
+        """
+        # Convert DataFrame to CSV in memory
+        csv_buffer = StringIO()
+        df.to_csv(csv_buffer, index=False)
+
+        # Connect to blob storage account
+        blob_service_client = BlobServiceClient.from_connection_string(
+            vars.storage_account_conneciton_string)
+
+        # Connect to container within the storage account
+        blob_client = blob_service_client.get_blob_client(
+            container=container,
+            blob=output_filename)
+
+        # Upload CSV to Azure Blob Storage
+        blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
+
+    def export_activity_data(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
         """
         Exports activity data to a CSV file and uploads it to Azure Blob Storage.
 
@@ -211,7 +298,8 @@ class ApiService:
         df = pd.DataFrame(data)
 
         # Remove unwanted columns
-        df = df[['name',
+        df = df[['id',
+                 'name',
                  'distance',
                  'moving_time',
                  'total_elevation_gain',
@@ -225,18 +313,4 @@ class ApiService:
         # Clean up polyline data from map column in dataframe
         df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
 
-        # Convert DataFrame to CSV in memory
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, index=False)
-
-        # Connect to blob storage account
-        blob_service_client = BlobServiceClient.from_connection_string(
-            vars.storage_account_conneciton_string)
-
-        # Connect to container within the storage account
-        blob_client = blob_service_client.get_blob_client(
-            container=container,
-            blob=output_filename)
-
-        # Upload CSV to Azure Blob Storage
-        blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
+        self.export_data_as_csv(df=df, vars=vars, container=container, output_filename=output_filename)
