@@ -93,3 +93,7 @@ Due to the sensitive nature of the data, both applications are secured behind au
 ### Coastal Path Page
 
 ![Screenshot of Coastal Path Page](docs/assets/coastal_path_page.png?raw=true "Coastal Path Page")
+
+### Coastal Path Page
+
+![Screenshot of PB Effort Overview Page](docs/assets/pb_effort_overview_page.png?raw=true "PB Effort Overview Page")

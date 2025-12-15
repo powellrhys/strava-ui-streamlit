@@ -6,6 +6,7 @@ import pandas as pd
 
 def render_running_pb_section(data: StravaData) -> None:
     """
+    Simple streamlit section to render best PB efforts for various distances
     """
     # Render distance selectbox
     distance = st.selectbox(label="Distance", options=["5km", "10km", "Half Marathon"], index=2)
@@ -28,7 +29,7 @@ def render_running_pb_section(data: StravaData) -> None:
                 x="date",
                 y="minutes",
                 markers=True,
-                title="Race Times Over Dates",
+                title=f"Overview of PB efforts for {distance_map[distance]}",
                 hover_name="name",
                 labels={
                     "minutes": "Minutes",
@@ -52,4 +53,5 @@ def render_running_pb_section(data: StravaData) -> None:
             st.plotly_chart(fig)
 
     else:
+        # Render info component to highlight the fact that there is no data just yet
         st.info(f"No PB efforts recorded for {distance}")

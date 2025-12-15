@@ -26,4 +26,5 @@ if st.user.is_logged_in:
                                 container_name='strava',
                                 blob_name='pb_effort_data.csv')
 
+    # Render running pb section
     render_running_pb_section(data=pb_effort_data)
