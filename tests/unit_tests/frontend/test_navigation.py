@@ -3,6 +3,7 @@ from frontend.functions.navigation import get_navigation
 from unittest.mock import patch, MagicMock
 import unittest
 
+
 class TestGetNavigation(unittest.TestCase):
 
     @patch('frontend.functions.navigation.st')
@@ -16,7 +17,10 @@ class TestGetNavigation(unittest.TestCase):
         mock_st.navigation.return_value = mock_nav
 
         # Mock st.Page to return predictable values
-        mock_st.Page.side_effect = lambda *args, **kwargs: {"args": args, "kwargs": kwargs}
+        mock_st.Page.side_effect = lambda *args, **kwargs: {
+            "args": args,
+            "kwargs": kwargs,
+        }
 
         # Call function
         result = get_navigation()
@@ -34,6 +38,9 @@ class TestGetNavigation(unittest.TestCase):
 
             # Running
             (("pages/pb_efforts.py",), {"title": "PB Efforts Overview"}),
+
+            # Triathlon
+            (("pages/triathlon_training.py",), {"title": "Training Overview"}),
         ]
 
         actual_calls = mock_st.Page.call_args_list
@@ -44,7 +51,6 @@ class TestGetNavigation(unittest.TestCase):
             self.assertEqual(actual_call[1], expected_call[1])
 
         # --- Validate st.navigation call ---
-        # Recreate expected pages dict using the mocked return values
         expected_pages = {
             "Overview": [
                 {"args": (), "kwargs": {"page": "pages/home.py", "title": "Home"}},
@@ -57,6 +63,9 @@ class TestGetNavigation(unittest.TestCase):
             ],
             "Running": [
                 {"args": ("pages/pb_efforts.py",), "kwargs": {"title": "PB Efforts Overview"}},
+            ],
+            "Triathlon": [
+                {"args": ("pages/triathlon_training.py",), "kwargs": {"title": "Training Overview"}},
             ],
         }
 

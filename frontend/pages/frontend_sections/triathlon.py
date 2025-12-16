@@ -7,6 +7,7 @@ import pandas as pd
 
 def render_running_pb_section(data: StravaData, vars: Variables) -> None:
     """
+    Function to render triathlon progress dashboard component
     """
     # Render page title
     st.title("Triathlon Training Overview")
