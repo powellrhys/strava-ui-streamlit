@@ -18,7 +18,7 @@ from functions.ui_sections import (
 )
 
 # Set page config
-configure_page_config(repository_name='play-cricket',
+configure_page_config(repository_name='strava-ui-streamlit',
                       page_icon='🏃‍♂️')
 
 # Collect codebase variables

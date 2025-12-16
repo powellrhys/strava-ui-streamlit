@@ -1,20 +1,10 @@
-# Import python dependencies
-import streamlit as st
+# Import dependencies
+from pages.frontend_sections.triathlon import render_running_pb_section
+from streamlit_components.ui_components import configure_page_config
+from functions.data_functions import StravaData, Variables
 
-# Import project dependencies
-from streamlit_components.ui_components import (
-    configure_page_config
-)
-from functions.data_functions import (
-    StravaData,
-    Variables
-)
-from functions.ui_components import (
-    render_page_logo
-)
-from functions.ui_sections import (
-    render_home_page
-)
+from functions.ui_components import render_page_logo
+import streamlit as st
 
 # Set page config
 configure_page_config(repository_name='strava-ui-streamlit',
@@ -33,10 +23,10 @@ if st.user.is_logged_in:
     # Render page logo
     render_page_logo()
 
-    # Read in activity data from blob storage
+    # Read in activity data
     activity_data_df = StravaData(blob_connection_string=vars.blob_connection_string,
                                   container_name='strava',
                                   blob_name='activity_data.csv')
 
-    # Render home page
-    render_home_page(data=activity_data_df, vars=vars)
+    # Render triathlon training dashboard
+    render_running_pb_section(data=activity_data_df, vars=vars)

@@ -21,6 +21,9 @@ def get_navigation() -> st.navigation:
         ],
         "Running": [
             st.Page("pages/pb_efforts.py", title="PB Efforts Overview"),
+        ],
+        "Triathlon": [
+            st.Page("pages/triathlon_training.py", title="Training Overview"),
         ]
     }
 
