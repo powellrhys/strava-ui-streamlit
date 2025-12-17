@@ -1,10 +1,11 @@
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import BlobServiceClient, ContentSettings
 from dotenv import load_dotenv
 from typing import Optional
 from io import StringIO
 import pandas as pd
 import requests
 import logging
+import json
 import os
 
 load_dotenv()
@@ -242,6 +243,87 @@ class ApiService:
             pb_effort_data.append(filtered_data)
 
         return pd.DataFrame(pb_effort_data)
+
+    def collect_activity_stream_data(self, activity_data: list, vars: Variables, access_token: Optional[str] = None) -> pd.DataFrame:
+        """
+        """
+        # Collect pb effort activity ids
+        pb_efforts_ids = [k['id'] for k in activity_data
+                          if any(dist in k['name'] for dist in ['[5km]', '[10km]', '[HM]'])]
+
+        # Manage access token
+        if access_token is None:
+            access_token = self.access_token
+
+        # Define request header
+        header = {'Authorization': 'Bearer ' + access_token}
+
+        # Iterate through each pb effort activity
+        for activity_id in pb_efforts_ids:
+            # Define activity url
+            activities_url = f"https://www.strava.com/api/v3/activities/{activity_id}/streams"
+
+            params = {
+                "keys": "distance,heartrate,time",
+                "key_by_type": "true"
+            }
+
+            # Execute request
+            data = requests.get(
+                url=activities_url,
+                headers=header,
+                params=params
+            ).json()
+
+            distance = data.get("distance", {}).get("data", [])
+            heartrate = data.get("heartrate", {}).get("data", [])
+            time = data.get("time", {}).get("data", [])
+
+            splits = []
+            current_split_start_idx = 0
+            split_distance = 1000  # meters
+
+            for i in range(1, len(distance)):
+                if distance[i] - distance[current_split_start_idx] >= split_distance:
+                    split = {
+                        "split_number": len(splits) + 1,
+                        "start_time": time[current_split_start_idx],
+                        "end_time": time[i],
+                        "split_time": time[i] - time[current_split_start_idx],
+                        "avg_hr": (
+                            sum(heartrate[current_split_start_idx:i]) /
+                            len(heartrate[current_split_start_idx:i])
+                            if heartrate else None
+                        )
+                    }
+                    splits.append(split)
+                    current_split_start_idx = i
+
+            self.export_data_as_json(data=splits, vars=vars, container="strava", output_filename=f"stream/{activity_id}.json")
+
+    def export_data_as_json(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
+        """
+        """
+        # Serialize to JSON
+        json_data = json.dumps(data)
+
+        # Connect to blob storage account
+        blob_service_client = BlobServiceClient.from_connection_string(
+            vars.storage_account_conneciton_string
+        )
+
+        # Connect to container within the storage account
+        blob_client = blob_service_client.get_blob_client(
+            container=container,
+            blob=output_filename  # e.g. "activity_12345_streams.json"
+        )
+
+        # Upload JSON to Azure Blob Storage
+        blob_client.upload_blob(
+            json_data,
+            overwrite=True,
+            content_settings=ContentSettings(content_type="application/json")
+        )
 
     def export_data_as_csv(self, df: pd.DataFrame, vars: Variables, container: str, output_filename: str) -> None:
         """
