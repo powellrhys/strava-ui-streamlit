@@ -244,7 +244,12 @@ class ApiService:
 
         return pd.DataFrame(pb_effort_data)
 
-    def collect_activity_stream_data(self, activity_data: list, vars: Variables, access_token: Optional[str] = None) -> pd.DataFrame:
+    def collect_activity_stream_data(
+            self,
+            activity_data: list,
+            vars: Variables,
+            access_token: Optional[str] = None
+    ) -> pd.DataFrame:
         """
         """
         # Collect pb effort activity ids
@@ -261,7 +266,8 @@ class ApiService:
         # Iterate through each pb effort activity
         for activity_id in pb_efforts_ids:
             # Define activity url
-            activities_url = f"https://www.strava.com/api/v3/activities/{activity_id}/streams"
+            activities_url = f"https://www.strava.com/api/v3/activities/{activity_id}/" + \
+                "streams?keys=time,velocity_smooth,distance,heartrate"
 
             params = {
                 "keys": "distance,heartrate,time",
@@ -279,9 +285,16 @@ class ApiService:
             heartrate = data.get("heartrate", {}).get("data", [])
             time = data.get("time", {}).get("data", [])
 
+            remapped_data = [
+                {key: value["data"][i] for key, value in data.items()}
+                for i in range(len(next(iter(data.values()))["data"]))
+            ]
+
+            remapped_data = downsample_mean(remapped_data, factor=round(len(remapped_data) / 50))
+
             splits = []
             current_split_start_idx = 0
-            split_distance = 1000  # meters
+            split_distance = 1000
 
             for i in range(1, len(distance)):
                 if distance[i] - distance[current_split_start_idx] >= split_distance:
@@ -291,15 +304,19 @@ class ApiService:
                         "end_time": time[i],
                         "split_time": time[i] - time[current_split_start_idx],
                         "avg_hr": (
-                            sum(heartrate[current_split_start_idx:i]) /
-                            len(heartrate[current_split_start_idx:i])
+                            sum(heartrate[current_split_start_idx:i]) / len(heartrate[current_split_start_idx:i])
                             if heartrate else None
                         )
                     }
                     splits.append(split)
                     current_split_start_idx = i
 
-            self.export_data_as_json(data=splits, vars=vars, container="strava", output_filename=f"stream/{activity_id}.json")
+            exported_data = {}
+            exported_data["splits"] = splits
+            exported_data["raw"] = remapped_data
+
+            self.export_data_as_json(data=exported_data, vars=vars, container="strava",
+                                     output_filename=f"stream/{activity_id}.json")
 
     def export_data_as_json(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
         """
@@ -396,3 +413,19 @@ class ApiService:
         df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
 
         self.export_data_as_csv(df=df, vars=vars, container=container, output_filename=output_filename)
+
+def downsample_mean(rows, factor):
+    """
+    """
+    keys = rows[0].keys()
+    result = []
+
+    for i in range(0, len(rows), factor):
+        chunk = rows[i:i + factor]
+        averaged = {
+            k: sum(row[k] for row in chunk) / len(chunk)
+            for k in keys
+        }
+        result.append(averaged)
+
+    return result

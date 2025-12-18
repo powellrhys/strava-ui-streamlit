@@ -1,7 +1,6 @@
 # Import python dependencies
-from streamlit_components.data_functions import (
-    BlobData
-)
+from streamlit_components.data_functions import BlobData
+from azure.storage.blob import BlobServiceClient
 from folium.plugins import Fullscreen
 from typing import Tuple
 import streamlit as st
@@ -9,7 +8,7 @@ import datetime as dt
 import pandas as pd
 import polyline
 import folium
-
+import json
 
 class Variables:
     """
@@ -287,3 +286,22 @@ def sum_coastal_path_distance(data: StravaData) -> Tuple[float, pd.DataFrame]:
     distance_per_year = df.groupby('year')['wcp_value'].sum().reset_index()
 
     return float(df['wcp_value'].sum()), distance_per_year
+
+def read_json_from_blob(vars: Variables, container_name: str, blob_name: str) -> list:
+    """
+    """
+    # --- Connect to Blob Storage ---
+    blob_service_client = BlobServiceClient.from_connection_string(
+        vars.blob_connection_string
+    )
+
+    blob_client = blob_service_client.get_blob_client(
+        container=container_name,
+        blob=blob_name
+    )
+
+    # --- Download and parse JSON ---
+    downloaded_bytes = blob_client.download_blob().readall()
+    data = json.loads(downloaded_bytes)
+
+    return data
