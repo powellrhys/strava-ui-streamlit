@@ -37,6 +37,11 @@ logger.info("Collecting activity data...")
 activity_data = app.collect_all_activity_data()
 logger.info("Activity Data collected \n")
 
+# Collect stream data for pb effort data
+logger.info("Collecting stream data for pb efforts...")
+app.collect_activity_stream_data(activity_data=activity_data, vars=vars)
+logger.info("Stream data collected and exported for pb efforts \n")
+
 # Collect and export pb effort data
 logger.info("Collecting and exporting pb effort data...")
 pb_effort_data = app.collect_pb_effort_activities(activity_data=activity_data)

@@ -1,10 +1,11 @@
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import BlobServiceClient, ContentSettings
 from dotenv import load_dotenv
 from typing import Optional
 from io import StringIO
 import pandas as pd
 import requests
 import logging
+import json
 import os
 
 load_dotenv()
@@ -243,6 +244,148 @@ class ApiService:
 
         return pd.DataFrame(pb_effort_data)
 
+    def collect_activity_stream_data(
+            self,
+            activity_data: list,
+            vars: Variables,
+            access_token: Optional[str] = None
+    ) -> pd.DataFrame:
+        """
+        Collect activity stream data for PB efforts and export splits as JSON to blob storage.
+
+        Fetches distance, heartrate, and time streams from Strava for activities tagged with
+        [5km], [10km], or [HM]. Computes 1km splits with timing and average heart rate,
+        then exports each activity's splits as JSON to Azure Blob Storage.
+
+        Parameters
+        ----------
+        activity_data : list
+            List of activity metadata dictionaries.
+        vars : Variables
+            Configuration object containing storage connection string.
+        access_token : str, optional
+            Strava API access token; defaults to the instance token.
+
+        Returns
+        -------
+        None
+            This method performs data collection and export but does not return a value.
+        """
+        # Collect pb effort activity ids
+        pb_efforts_ids = [k['id'] for k in activity_data
+                          if any(dist in k['name'] for dist in ['[5km]', '[10km]', '[HM]'])]
+
+        # Manage access token
+        if access_token is None:
+            access_token = self.access_token
+
+        # Define request header
+        header = {'Authorization': 'Bearer ' + access_token}
+
+        # Iterate through each pb effort activity
+        for activity_id in pb_efforts_ids:
+            # Define activity url
+            activities_url = f"https://www.strava.com/api/v3/activities/{activity_id}/" + \
+                "streams?keys=time,velocity_smooth,distance,heartrate"
+
+            # Define request parameters
+            params = {
+                "keys": "distance,heartrate,time",
+                "key_by_type": "true"
+            }
+
+            # Execute request
+            data = requests.get(
+                url=activities_url,
+                headers=header,
+                params=params
+            ).json()
+
+            # Fetch distance, HR and time data from request response
+            distance = data.get("distance", {}).get("data", [])
+            heartrate = data.get("heartrate", {}).get("data", [])
+            time = data.get("time", {}).get("data", [])
+
+            # Remap raw data to fit structure generated for split data
+            remapped_data = [
+                {key: value["data"][i] for key, value in data.items()}
+                for i in range(len(next(iter(data.values()))["data"]))
+            ]
+
+            # Smooth out raw data
+            remapped_data = downsample_mean(remapped_data, factor=round(len(remapped_data) / 50))
+
+            # Iterate through raw data and generate aggregated split data
+            splits = []
+            current_split_start_idx = 0
+            split_distance = 1000
+            for i in range(1, len(distance)):
+                if distance[i] - distance[current_split_start_idx] >= split_distance:
+                    split = {
+                        "split_number": len(splits) + 1,
+                        "start_time": time[current_split_start_idx],
+                        "end_time": time[i],
+                        "split_time": time[i] - time[current_split_start_idx],
+                        "avg_hr": (
+                            sum(heartrate[current_split_start_idx:i]) / len(heartrate[current_split_start_idx:i])
+                            if heartrate else None
+                        )
+                    }
+                    splits.append(split)
+                    current_split_start_idx = i
+
+            # Generate json payload to store in blob
+            exported_data = {}
+            exported_data["splits"] = splits
+            exported_data["raw"] = remapped_data
+
+            # Export data to blob
+            self.export_data_as_json(data=exported_data, vars=vars, container="strava",
+                                     output_filename=f"stream/{activity_id}.json")
+
+    def export_data_as_json(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
+        """
+        Export data as JSON to Azure Blob Storage.
+
+        Serializes the provided data to JSON format and uploads it to the specified
+        Azure Blob Storage container with the appropriate content type.
+
+        Parameters
+        ----------
+        data : list
+            The data to export (typically a list of dictionaries).
+        vars : Variables
+            Configuration object containing the storage account connection string.
+        container : str
+            The name of the Azure Blob Storage container.
+        output_filename : str
+            The blob path/filename for the uploaded JSON file.
+
+        Returns
+        -------
+        None
+        """
+        # Serialize to JSON
+        json_data = json.dumps(data)
+
+        # Connect to blob storage account
+        blob_service_client = BlobServiceClient.from_connection_string(
+            vars.storage_account_conneciton_string
+        )
+
+        # Connect to container within the storage account
+        blob_client = blob_service_client.get_blob_client(
+            container=container,
+            blob=output_filename
+        )
+
+        # Upload JSON to Azure Blob Storage
+        blob_client.upload_blob(
+            json_data,
+            overwrite=True,
+            content_settings=ContentSettings(content_type="application/json")
+        )
+
     def export_data_as_csv(self, df: pd.DataFrame, vars: Variables, container: str, output_filename: str) -> None:
         """
         Export a pandas DataFrame as a CSV file to an Azure Blob Storage container.
@@ -314,3 +457,31 @@ class ApiService:
         df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
 
         self.export_data_as_csv(df=df, vars=vars, container=container, output_filename=output_filename)
+
+def downsample_mean(rows, factor):
+    """
+    Downsample a list of dict-like rows by averaging values over fixed-size chunks.
+
+    Args:
+        rows (list[dict]): Sequence of rows with identical numeric keys.
+        factor (int): Number of consecutive rows to average into one.
+
+    Returns:
+        list[dict]: Downsampled rows where each value is the mean over a chunk.
+    """
+    # Assume all rows share the same keys
+    keys = rows[0].keys()
+    result = []
+
+    # Process rows in chunks of size `factor`
+    for i in range(0, len(rows), factor):
+        chunk = rows[i:i + factor]
+
+        # Compute mean for each key within the chunk
+        averaged = {
+            k: sum(row[k] for row in chunk) / len(chunk)
+            for k in keys
+        }
+        result.append(averaged)
+
+    return result
