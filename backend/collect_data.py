@@ -37,34 +37,37 @@ logger.info("Collecting activity data...")
 activity_data = app.collect_all_activity_data()
 logger.info("Activity Data collected \n")
 
+# Collect stream data for pb effort data
+logger.info("Collecting stream data for pb efforts...")
 app.collect_activity_stream_data(activity_data=activity_data, vars=vars)
+logger.info("Stream data collected and exported for pb efforts \n")
 
-# # Collect and export pb effort data
-# logger.info("Collecting and exporting pb effort data...")
-# pb_effort_data = app.collect_pb_effort_activities(activity_data=activity_data)
-# app.export_data_as_csv(df=pb_effort_data,
-#                        vars=vars,
-#                        container='strava',
-#                        output_filename='pb_effort_data.csv')
-# logger.info("PB effort data exported \n")
+# Collect and export pb effort data
+logger.info("Collecting and exporting pb effort data...")
+pb_effort_data = app.collect_pb_effort_activities(activity_data=activity_data)
+app.export_data_as_csv(df=pb_effort_data,
+                       vars=vars,
+                       container='strava',
+                       output_filename='pb_effort_data.csv')
+logger.info("PB effort data exported \n")
 
-# # Filter out activity data
-# logger.info("Filter out coastal path activities...")
-# costal_path_data = app.filter_out_coastal_path_data(activity_data=activity_data)
-# logger.info("Coastal path data filtered out \n")
+# Filter out activity data
+logger.info("Filter out coastal path activities...")
+costal_path_data = app.filter_out_coastal_path_data(activity_data=activity_data)
+logger.info("Coastal path data filtered out \n")
 
-# # Export activity data to blob storage
-# logger.info("Exporting activity data...")
-# app.export_activity_data(data=activity_data,
-#                          vars=vars,
-#                          container='strava',
-#                          output_filename='activity_data.csv')
-# logger.info("Data exported to blob storage \n")
+# Export activity data to blob storage
+logger.info("Exporting activity data...")
+app.export_activity_data(data=activity_data,
+                         vars=vars,
+                         container='strava',
+                         output_filename='activity_data.csv')
+logger.info("Data exported to blob storage \n")
 
-# # Export coastal path data to blob storage
-# logger.info("Exporting coastal path data...")
-# app.export_activity_data(data=costal_path_data,
-#                          vars=vars,
-#                          container='strava',
-#                          output_filename='coastal_path_data.csv')
-# logger.info("Data exported to blob storage \n")
+# Export coastal path data to blob storage
+logger.info("Exporting coastal path data...")
+app.export_activity_data(data=costal_path_data,
+                         vars=vars,
+                         container='strava',
+                         output_filename='coastal_path_data.csv')
+logger.info("Data exported to blob storage \n")
