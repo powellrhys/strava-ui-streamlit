@@ -97,3 +97,7 @@ Due to the sensitive nature of the data, both applications are secured behind au
 ### PB Effort Overview Page
 
 ![Screenshot of PB Effort Overview Page](docs/assets/pb_effort_overview_page.png?raw=true "PB Effort Overview Page")
+
+### Triathlon Training Overview Page
+
+![Screenshot of Triathlon Training Overview Page](docs/assets/triathlon_overview_page.png?raw=true "Triathlon Training Overview Page")
