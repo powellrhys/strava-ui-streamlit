@@ -458,6 +458,66 @@ class ApiService:
 
         self.export_data_as_csv(df=df, vars=vars, container=container, output_filename=output_filename)
 
+    def collect_wcp_segments(
+        self,
+        access_token: Optional[str] = None,
+        per_page: int = 200,
+        page: int = 1
+    ) -> pd.DataFrame:
+        """
+        """
+        if access_token is None:
+            access_token = self.access_token
+
+        # Define activity url
+        activities_url = "https://www.strava.com/api/v3/segments/starred"
+
+        # Define request header and parameters
+        header = {'Authorization': 'Bearer ' + access_token}
+        param = {'per_page': per_page, 'page': page}
+
+        # Execute request
+        data = requests.get(
+            url=activities_url,
+            headers=header,
+            params=param
+        ).json()
+
+        wcp_segments = [segment for segment in data if "WCP" in segment["name"]]
+
+        wcp_data = []
+        for wcp_segment in wcp_segments:
+
+            wcp_data.append(
+                {
+                    "id": wcp_segment["id"],
+                    "name": wcp_segment["name"],
+                    "polyline": self.collect_wcp_polyline(id=wcp_segment["id"])
+                }
+            )
+
+        return pd.DataFrame(wcp_data)
+
+    def collect_wcp_polyline(self, id: int, access_token: Optional[str] = None) -> str:
+        """
+        """
+        if access_token is None:
+            access_token = self.access_token
+
+        # Define activity url
+        activities_url = f"https://www.strava.com/api/v3/segments/{id}"
+
+        # Define request header and parameters
+        header = {'Authorization': 'Bearer ' + access_token}
+
+        # Execute request
+        data = requests.get(
+            url=activities_url,
+            headers=header
+        ).json()
+
+        return data["map"]["polyline"]
+
 def downsample_mean(rows, factor):
     """
     Downsample a list of dict-like rows by averaging values over fixed-size chunks.

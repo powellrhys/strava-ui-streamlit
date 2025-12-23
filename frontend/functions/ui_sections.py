@@ -355,7 +355,7 @@ def render_progress_page(
     # Illustrate figure
     st.plotly_chart(fig)
 
-def render_costal_path_page(data: StravaData) -> None:
+def render_costal_path_page(data: StravaData, vars: Variables) -> None:
     """
     Renders the Coastal Path Heatmap page using Streamlit.
 
@@ -405,7 +405,7 @@ def render_costal_path_page(data: StravaData) -> None:
                 title="Breakdown of Welsh Coastal Path Progress").plot_bar())
 
     # Generate coastal path heatmap
-    map = generate_coastal_path_heatmap(data=data)
+    map = generate_coastal_path_heatmap(vars=vars)
 
     # Update buffer variable with folium object
     st.session_state.buffer.write(map.encode())

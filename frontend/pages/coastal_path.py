@@ -43,4 +43,4 @@ if st.user.is_logged_in:
                                  blob_name='coastal_path_data.csv')
 
     # Render coastal path page
-    render_costal_path_page(data=coastal_path_df)
+    render_costal_path_page(data=coastal_path_df, vars=vars)

@@ -71,3 +71,9 @@ app.export_activity_data(data=costal_path_data,
                          container='strava',
                          output_filename='coastal_path_data.csv')
 logger.info("Data exported to blob storage \n")
+
+# Export Coastal Path segment data
+logger.info("Collecting coastal path segment data...")
+wcp_segments_df = app.collect_wcp_segments()
+app.export_data_as_csv(df=wcp_segments_df, vars=vars, container="strava", output_filename="wcp_segments.csv")
+logger.info("Coastal Path segment data collected \n")

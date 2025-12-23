@@ -196,7 +196,7 @@ def generate_heatmap(
     st.session_state.download_disabled = False
 
 def generate_coastal_path_heatmap(
-    data: StravaData
+    vars: Variables
 ) -> folium.Map._repr_html_:
     """
     Generates an interactive Folium heatmap of Strava activities along the coastal path.
@@ -219,7 +219,11 @@ def generate_coastal_path_heatmap(
         An HTML string representing the rendered heatmap for embedding or display.
     """
     # Convert dataframe into list of dictionaries
-    activity_data = data.return_dataframe().to_dict(orient='records')
+    activity_data = StravaData(blob_connection_string=vars.blob_connection_string,
+                               container_name='strava',
+                               blob_name='wcp_segments.csv').return_dataframe().to_dict(orient='records')
+
+    # activity_data = data.return_dataframe().
 
     # Generate folium map object
     m = folium.Map(tiles='cartodb positron',
@@ -230,7 +234,7 @@ def generate_coastal_path_heatmap(
     for activity in activity_data:
 
         # Collect and decode activity polyline
-        curve = activity["map"]
+        curve = activity["polyline"]
         data = polyline.decode(curve)
 
         # Plot gps data on map object
