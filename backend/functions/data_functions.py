@@ -8,31 +8,31 @@ import logging
 import json
 import os
 
-load_dotenv()
+# load_dotenv()
 
-class Variables:
-    """
-    A container class for storing application-wide constants and configuration variables.
+# class Variables:
+#     """
+#     A container class for storing application-wide constants and configuration variables.
 
-    This class loads necessary values such as API credentials and storage connection strings
-    from environment variables during initialization.
+#     This class loads necessary values such as API credentials and storage connection strings
+#     from environment variables during initialization.
 
-    Attributes:
-        client_id (str): The Strava client ID, loaded from the 'client_id' environment variable.
-        client_secret (str): The Strava client secret, loaded from the 'client_secret' environment variable.
-        refresh_token (str): The OAuth refresh token, loaded from the 'refresh_token' environment variable.
-        storage_account_connection_string (str): Azure Blob Storage connection string,
-            loaded from the 'blob_connection_string' environment variable.
-    """
-    def __init__(self):
+#     Attributes:
+#         client_id (str): The Strava client ID, loaded from the 'client_id' environment variable.
+#         client_secret (str): The Strava client secret, loaded from the 'client_secret' environment variable.
+#         refresh_token (str): The OAuth refresh token, loaded from the 'refresh_token' environment variable.
+#         storage_account_connection_string (str): Azure Blob Storage connection string,
+#             loaded from the 'blob_connection_string' environment variable.
+#     """
+#     def __init__(self):
 
-        # API related variables
-        self.client_id = os.getenv('client_id')
-        self.client_secret = os.getenv('client_secret')
-        self.refresh_token = os.getenv('refresh_token')
+#         # API related variables
+#         self.client_id = os.getenv('client_id')
+#         self.client_secret = os.getenv('client_secret')
+#         self.refresh_token = os.getenv('refresh_token')
 
-        # Storage account variables
-        self.storage_account_conneciton_string = os.getenv('blob_connection_string')
+#         # Storage account variables
+#         self.storage_account_conneciton_string = os.getenv('blob_connection_string')
 
 
 class ApiService:
@@ -61,133 +61,133 @@ class ApiService:
         self.refresh_token = refresh_token
         self.logger = logger
 
-    def collect_access_token(self) -> Optional[str]:
-        """
-        Refreshes and retrieves a new access token from the Strava API using the refresh token.
+    # def collect_access_token(self) -> Optional[str]:
+    #     """
+    #     Refreshes and retrieves a new access token from the Strava API using the refresh token.
 
-        Sends a POST request to Strava's OAuth token endpoint with the stored client credentials
-        and refresh token, then extracts and stores the new access token.
+    #     Sends a POST request to Strava's OAuth token endpoint with the stored client credentials
+    #     and refresh token, then extracts and stores the new access token.
 
-        Returns:
-            Optional[str]: The new access token if the request is successful; otherwise, None.
+    #     Returns:
+    #         Optional[str]: The new access token if the request is successful; otherwise, None.
 
-        Side Effects:
-            Sets the instance attribute `self.access_token` with the newly obtained token.
-        """
-        response = requests.post('https://www.strava.com/api/v3/oauth/token',
-                                 data={
-                                     'client_id': self.client_id,
-                                     'client_secret': self.client_secret,
-                                     'grant_type': 'refresh_token',
-                                     'refresh_token': self.refresh_token})
+    #     Side Effects:
+    #         Sets the instance attribute `self.access_token` with the newly obtained token.
+    #     """
+    #     response = requests.post('https://www.strava.com/api/v3/oauth/token',
+    #                              data={
+    #                                  'client_id': self.client_id,
+    #                                  'client_secret': self.client_secret,
+    #                                  'grant_type': 'refresh_token',
+    #                                  'refresh_token': self.refresh_token})
 
-        tokens = response.json()
-        self.access_token = tokens['access_token']
+        # tokens = response.json()
+        # self.access_token = tokens['access_token']
 
-        return self.access_token, tokens
+        # return self.access_token, tokens
 
-    def get_activity_data(
-            self,
-            access_token: Optional[str] = None,
-            per_page: int = 200,
-            page: int = 1) -> list:
-        """
-        Retrieves a list of athlete activities from the Strava API.
+    # def get_activity_data(
+    #         self,
+    #         access_token: Optional[str] = None,
+    #         per_page: int = 200,
+    #         page: int = 1) -> list:
+    #     """
+    #     Retrieves a list of athlete activities from the Strava API.
 
-        Fetches activities for the authenticated user, with optional pagination support.
+    #     Fetches activities for the authenticated user, with optional pagination support.
 
-        Args:
-            access_token (Optional[str]): The access token for authorization. If None,
-                                        uses the instance's stored access token.
-            per_page (int): Number of activities to retrieve per page (default is 200).
-            page (int): Page number to retrieve (default is 1).
+    #     Args:
+    #         access_token (Optional[str]): The access token for authorization. If None,
+    #                                     uses the instance's stored access token.
+    #         per_page (int): Number of activities to retrieve per page (default is 200).
+    #         page (int): Page number to retrieve (default is 1).
 
-        Returns:
-            list: A list of activity records represented as dictionaries.
-        """
-        if access_token is None:
-            access_token = self.access_token
+    #     Returns:
+    #         list: A list of activity records represented as dictionaries.
+    #     """
+    #     if access_token is None:
+    #         access_token = self.access_token
 
-        # Define activity url
-        activities_url = "https://www.strava.com/api/v3/athlete/activities"
+    #     # Define activity url
+    #     activities_url = "https://www.strava.com/api/v3/athlete/activities"
 
-        # Define request header and parameters
-        header = {'Authorization': 'Bearer ' + access_token}
-        param = {'per_page': per_page, 'page': page}
+    #     # Define request header and parameters
+    #     header = {'Authorization': 'Bearer ' + access_token}
+    #     param = {'per_page': per_page, 'page': page}
 
-        # Execute request
-        data = requests.get(
-            url=activities_url,
-            headers=header,
-            params=param
-        ).json()
+    #     # Execute request
+    #     data = requests.get(
+    #         url=activities_url,
+    #         headers=header,
+    #         params=param
+    #     ).json()
 
-        return data
+    #     return data
 
-    def collect_all_activity_data(
-            self,
-            access_token: Optional[str] = None,
-            per_page: int = 200) -> list:
-        """
-        Retrieves all athlete activity data from the Strava API by paginating through results.
+    # def collect_all_activity_data(
+    #         self,
+    #         access_token: Optional[str] = None,
+    #         per_page: int = 200) -> list:
+    #     """
+    #     Retrieves all athlete activity data from the Strava API by paginating through results.
 
-        This method continuously fetches activity data page by page until no more activities
-        are returned, aggregating all results into a single list.
+    #     This method continuously fetches activity data page by page until no more activities
+    #     are returned, aggregating all results into a single list.
 
-        Args:
-            access_token (Optional[str]): The access token for API authorization. If None,
-                                        the instance's stored access token will be used.
-            per_page (int): Number of activities to retrieve per API request (default is 200).
+    #     Args:
+    #         access_token (Optional[str]): The access token for API authorization. If None,
+    #                                     the instance's stored access token will be used.
+    #         per_page (int): Number of activities to retrieve per API request (default is 200).
 
-        Returns:
-            list: A complete list of all activity records retrieved from the API.
-        """
-        if access_token is None:
-            access_token = self.access_token
-        page = 1
-        data = []
-        page_data = ['']
-        while len(page_data) > 0:
-            self.logger.info(f'Collecting data from page: {page}')
+    #     Returns:
+    #         list: A complete list of all activity records retrieved from the API.
+    #     """
+    #     if access_token is None:
+    #         access_token = self.access_token
+    #     page = 1
+    #     data = []
+    #     page_data = ['']
+    #     while len(page_data) > 0:
+    #         self.logger.info(f'Collecting data from page: {page}')
 
-            # Fetch data for specific page
-            page_data = self.get_activity_data(
-                access_token=access_token,
-                per_page=per_page,
-                page=page)
+    #         # Fetch data for specific page
+    #         page_data = self.get_activity_data(
+    #             access_token=access_token,
+    #             per_page=per_page,
+    #             page=page)
 
-            # Append page data to previous data already collected
-            data.extend(page_data)
+    #         # Append page data to previous data already collected
+    #         data.extend(page_data)
 
-            # Increment page number
-            page = page + 1
+    #         # Increment page number
+    #         page = page + 1
 
-        return data
+    #     return data
 
-    def filter_out_coastal_path_data(
-            self,
-            activity_data: pd.DataFrame) -> list:
-        """
-        Filters activity data to extract entries related to the coastal path.
+    # def filter_out_coastal_path_data(
+    #         self,
+    #         activity_data: pd.DataFrame) -> list:
+    #     """
+    #     Filters activity data to extract entries related to the coastal path.
 
-        This method scans the input DataFrame and returns a list of records where
-        the activity name contains the 'WCP' tag, indicating it is part of the Wales
-        Coast Path.
+    #     This method scans the input DataFrame and returns a list of records where
+    #     the activity name contains the 'WCP' tag, indicating it is part of the Wales
+    #     Coast Path.
 
-        Parameters:
-        ----------
-        activity_data : pd.DataFrame
-            A DataFrame containing Strava activity data. Each row should have a 'name' field.
+    #     Parameters:
+    #     ----------
+    #     activity_data : pd.DataFrame
+    #         A DataFrame containing Strava activity data. Each row should have a 'name' field.
 
-        Returns:
-        -------
-        list
-            A list of activity records (as dictionaries) related to the coastal path.
-        """
-        # Filter out coastal path data based on WCP tag in activity name
-        coastal_path_data = [data for data in activity_data if 'WCP' in data['name']]
+    #     Returns:
+    #     -------
+    #     list
+    #         A list of activity records (as dictionaries) related to the coastal path.
+    #     """
+    #     # Filter out coastal path data based on WCP tag in activity name
+    #     coastal_path_data = [data for data in activity_data if 'WCP' in data['name']]
 
-        return coastal_path_data
+    #     return coastal_path_data
 
     def collect_pb_effort_activities(self, activity_data: list, access_token: Optional[str] = None) -> pd.DataFrame:
         """
@@ -343,205 +343,205 @@ class ApiService:
             self.export_data_as_json(data=exported_data, vars=vars, container="strava",
                                      output_filename=f"stream/{activity_id}.json")
 
-    def export_data_as_json(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
-        """
-        Export data as JSON to Azure Blob Storage.
+    # def export_data_as_json(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
+    #     """
+    #     Export data as JSON to Azure Blob Storage.
 
-        Serializes the provided data to JSON format and uploads it to the specified
-        Azure Blob Storage container with the appropriate content type.
+    #     Serializes the provided data to JSON format and uploads it to the specified
+    #     Azure Blob Storage container with the appropriate content type.
 
-        Parameters
-        ----------
-        data : list
-            The data to export (typically a list of dictionaries).
-        vars : Variables
-            Configuration object containing the storage account connection string.
-        container : str
-            The name of the Azure Blob Storage container.
-        output_filename : str
-            The blob path/filename for the uploaded JSON file.
+    #     Parameters
+    #     ----------
+    #     data : list
+    #         The data to export (typically a list of dictionaries).
+    #     vars : Variables
+    #         Configuration object containing the storage account connection string.
+    #     container : str
+    #         The name of the Azure Blob Storage container.
+    #     output_filename : str
+    #         The blob path/filename for the uploaded JSON file.
 
-        Returns
-        -------
-        None
-        """
-        # Serialize to JSON
-        json_data = json.dumps(data)
+    #     Returns
+    #     -------
+    #     None
+    #     """
+    #     # Serialize to JSON
+    #     json_data = json.dumps(data)
 
-        # Connect to blob storage account
-        blob_service_client = BlobServiceClient.from_connection_string(
-            vars.storage_account_conneciton_string
-        )
+    #     # Connect to blob storage account
+    #     blob_service_client = BlobServiceClient.from_connection_string(
+    #         vars.storage_account_conneciton_string
+    #     )
 
-        # Connect to container within the storage account
-        blob_client = blob_service_client.get_blob_client(
-            container=container,
-            blob=output_filename
-        )
+    #     # Connect to container within the storage account
+    #     blob_client = blob_service_client.get_blob_client(
+    #         container=container,
+    #         blob=output_filename
+    #     )
 
-        # Upload JSON to Azure Blob Storage
-        blob_client.upload_blob(
-            json_data,
-            overwrite=True,
-            content_settings=ContentSettings(content_type="application/json")
-        )
+    #     # Upload JSON to Azure Blob Storage
+    #     blob_client.upload_blob(
+    #         json_data,
+    #         overwrite=True,
+    #         content_settings=ContentSettings(content_type="application/json")
+    #     )
 
-    def export_data_as_csv(self, df: pd.DataFrame, vars: Variables, container: str, output_filename: str) -> None:
-        """
-        Export a pandas DataFrame as a CSV file to an Azure Blob Storage container.
+    # def export_data_as_csv(self, df: pd.DataFrame, vars: Variables, container: str, output_filename: str) -> None:
+    #     """
+    #     Export a pandas DataFrame as a CSV file to an Azure Blob Storage container.
 
-        This method converts the provided DataFrame into an in-memory CSV string,
-        connects to the Azure Blob Storage account specified in `vars`, and uploads
-        the CSV content to the designated container and blob path.
+    #     This method converts the provided DataFrame into an in-memory CSV string,
+    #     connects to the Azure Blob Storage account specified in `vars`, and uploads
+    #     the CSV content to the designated container and blob path.
 
-        Parameters:
-            df : pd.DataFrame
-                The DataFrame to be exported as a CSV file.
-            vars : Variables
-                An object containing configuration values, including the Azure Storage
-                account connection string.
-            container : str
-                The name of the Azure Blob Storage container where the file will be uploaded.
-            output_filename : str
-                The name (including path, if applicable) of the CSV file to create in the blob container.
+    #     Parameters:
+    #         df : pd.DataFrame
+    #             The DataFrame to be exported as a CSV file.
+    #         vars : Variables
+    #             An object containing configuration values, including the Azure Storage
+    #             account connection string.
+    #         container : str
+    #             The name of the Azure Blob Storage container where the file will be uploaded.
+    #         output_filename : str
+    #             The name (including path, if applicable) of the CSV file to create in the blob container.
 
-        Returns: None (This method performs an upload and does not return a value.)
-        """
-        # Convert DataFrame to CSV in memory
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, index=False)
+    #     Returns: None (This method performs an upload and does not return a value.)
+    #     """
+    #     # Convert DataFrame to CSV in memory
+    #     csv_buffer = StringIO()
+    #     df.to_csv(csv_buffer, index=False)
 
-        # Connect to blob storage account
-        blob_service_client = BlobServiceClient.from_connection_string(
-            vars.storage_account_conneciton_string)
+    #     # Connect to blob storage account
+    #     blob_service_client = BlobServiceClient.from_connection_string(
+    #         vars.storage_account_conneciton_string)
 
-        # Connect to container within the storage account
-        blob_client = blob_service_client.get_blob_client(
-            container=container,
-            blob=output_filename)
+    #     # Connect to container within the storage account
+    #     blob_client = blob_service_client.get_blob_client(
+    #         container=container,
+    #         blob=output_filename)
 
-        # Upload CSV to Azure Blob Storage
-        blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
+    #     # Upload CSV to Azure Blob Storage
+        # blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
 
-    def export_activity_data(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
-        """
-        Exports activity data to a CSV file and uploads it to Azure Blob Storage.
+    # def export_activity_data(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
+    #     """
+    #     Exports activity data to a CSV file and uploads it to Azure Blob Storage.
 
-        Processes the list of activity dictionaries into a pandas DataFrame, selects
-        relevant columns, cleans up the map polyline data, converts the DataFrame
-        to CSV format, and uploads the CSV to the specified Azure Blob Storage container.
+    #     Processes the list of activity dictionaries into a pandas DataFrame, selects
+    #     relevant columns, cleans up the map polyline data, converts the DataFrame
+    #     to CSV format, and uploads the CSV to the specified Azure Blob Storage container.
 
-        Args:
-            data (list): A list of activity data dictionaries to export.
-            vars (Variables): An instance of the Variables class containing storage account credentials.
-            container (str): The name of the Azure Blob Storage container where the file will be uploaded.
-            output_filename (str): The name of the output CSV file in the blob storage.
-        """
-        # Generate pandas dataframe from data collected
-        df = pd.DataFrame(data)
+    #     Args:
+    #         data (list): A list of activity data dictionaries to export.
+    #         vars (Variables): An instance of the Variables class containing storage account credentials.
+    #         container (str): The name of the Azure Blob Storage container where the file will be uploaded.
+    #         output_filename (str): The name of the output CSV file in the blob storage.
+    #     """
+    #     # Generate pandas dataframe from data collected
+    #     df = pd.DataFrame(data)
 
-        # Remove unwanted columns
-        df = df[['id',
-                 'name',
-                 'distance',
-                 'moving_time',
-                 'total_elevation_gain',
-                 'type',
-                 'start_date',
-                 'kudos_count',
-                 'comment_count',
-                 'athlete_count',
-                 'map']]
+    #     # Remove unwanted columns
+    #     df = df[['id',
+    #              'name',
+    #              'distance',
+    #              'moving_time',
+    #              'total_elevation_gain',
+    #              'type',
+    #              'start_date',
+    #              'kudos_count',
+    #              'comment_count',
+    #              'athlete_count',
+    #              'map']]
 
-        # Clean up polyline data from map column in dataframe
-        df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
+    #     # Clean up polyline data from map column in dataframe
+    #     df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
 
-        self.export_data_as_csv(df=df, vars=vars, container=container, output_filename=output_filename)
+    #     self.export_data_as_csv(df=df, vars=vars, container=container, output_filename=output_filename)
 
-    def collect_wcp_segments(
-        self,
-        access_token: Optional[str] = None,
-        per_page: int = 200,
-        page: int = 1
-    ) -> pd.DataFrame:
-        """
-        """
-        if access_token is None:
-            access_token = self.access_token
+    # def collect_wcp_segments(
+    #     self,
+    #     access_token: Optional[str] = None,
+    #     per_page: int = 200,
+    #     page: int = 1
+    # ) -> pd.DataFrame:
+    #     """
+    #     """
+    #     if access_token is None:
+    #         access_token = self.access_token
 
-        # Define activity url
-        activities_url = "https://www.strava.com/api/v3/segments/starred"
+    #     # Define activity url
+    #     activities_url = "https://www.strava.com/api/v3/segments/starred"
 
-        # Define request header and parameters
-        header = {'Authorization': 'Bearer ' + access_token}
-        param = {'per_page': per_page, 'page': page}
+    #     # Define request header and parameters
+    #     header = {'Authorization': 'Bearer ' + access_token}
+    #     param = {'per_page': per_page, 'page': page}
 
-        # Execute request
-        data = requests.get(
-            url=activities_url,
-            headers=header,
-            params=param
-        ).json()
+    #     # Execute request
+    #     data = requests.get(
+    #         url=activities_url,
+    #         headers=header,
+    #         params=param
+    #     ).json()
 
-        wcp_segments = [segment for segment in data if "WCP" in segment["name"]]
+    #     wcp_segments = [segment for segment in data if "WCP" in segment["name"]]
 
-        wcp_data = []
-        for wcp_segment in wcp_segments:
+    #     wcp_data = []
+    #     for wcp_segment in wcp_segments:
 
-            wcp_data.append(
-                {
-                    "id": wcp_segment["id"],
-                    "name": wcp_segment["name"],
-                    "polyline": self.collect_wcp_polyline(id=wcp_segment["id"])
-                }
-            )
+    #         wcp_data.append(
+    #             {
+    #                 "id": wcp_segment["id"],
+    #                 "name": wcp_segment["name"],
+    #                 "polyline": self.collect_wcp_polyline(id=wcp_segment["id"])
+    #             }
+    #         )
 
-        return pd.DataFrame(wcp_data)
+    #     return pd.DataFrame(wcp_data)
 
-    def collect_wcp_polyline(self, id: int, access_token: Optional[str] = None) -> str:
-        """
-        """
-        if access_token is None:
-            access_token = self.access_token
+    # def collect_wcp_polyline(self, id: int, access_token: Optional[str] = None) -> str:
+    #     """
+    #     """
+    #     if access_token is None:
+    #         access_token = self.access_token
 
-        # Define activity url
-        activities_url = f"https://www.strava.com/api/v3/segments/{id}"
+    #     # Define activity url
+    #     activities_url = f"https://www.strava.com/api/v3/segments/{id}"
 
-        # Define request header and parameters
-        header = {'Authorization': 'Bearer ' + access_token}
+    #     # Define request header and parameters
+    #     header = {'Authorization': 'Bearer ' + access_token}
 
-        # Execute request
-        data = requests.get(
-            url=activities_url,
-            headers=header
-        ).json()
+    #     # Execute request
+    #     data = requests.get(
+    #         url=activities_url,
+    #         headers=header
+    #     ).json()
 
-        return data["map"]["polyline"]
+    #     return data["map"]["polyline"]
 
-def downsample_mean(rows, factor):
-    """
-    Downsample a list of dict-like rows by averaging values over fixed-size chunks.
+# def downsample_mean(rows, factor):
+#     """
+#     Downsample a list of dict-like rows by averaging values over fixed-size chunks.
 
-    Args:
-        rows (list[dict]): Sequence of rows with identical numeric keys.
-        factor (int): Number of consecutive rows to average into one.
+#     Args:
+#         rows (list[dict]): Sequence of rows with identical numeric keys.
+#         factor (int): Number of consecutive rows to average into one.
 
-    Returns:
-        list[dict]: Downsampled rows where each value is the mean over a chunk.
-    """
-    # Assume all rows share the same keys
-    keys = rows[0].keys()
-    result = []
+#     Returns:
+#         list[dict]: Downsampled rows where each value is the mean over a chunk.
+#     """
+#     # Assume all rows share the same keys
+#     keys = rows[0].keys()
+#     result = []
 
-    # Process rows in chunks of size `factor`
-    for i in range(0, len(rows), factor):
-        chunk = rows[i:i + factor]
+#     # Process rows in chunks of size `factor`
+#     for i in range(0, len(rows), factor):
+#         chunk = rows[i:i + factor]
 
-        # Compute mean for each key within the chunk
-        averaged = {
-            k: sum(row[k] for row in chunk) / len(chunk)
-            for k in keys
-        }
-        result.append(averaged)
+#         # Compute mean for each key within the chunk
+#         averaged = {
+#             k: sum(row[k] for row in chunk) / len(chunk)
+#             for k in keys
+#         }
+#         result.append(averaged)
 
-    return result
+#     return result
