@@ -40,7 +40,7 @@ jobs:
       # Install project dependencies via Poetry
       - name: Install dependencies
         run: |
-          poetry install --no-interaction --no-root
+          poetry install --no-interaction
 
       # Run data collection script
       - name: Run Data Collection Script
