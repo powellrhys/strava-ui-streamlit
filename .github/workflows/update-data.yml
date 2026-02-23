@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   Update-Data:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       # Check out codebase
