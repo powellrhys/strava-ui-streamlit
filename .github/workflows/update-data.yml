@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   Update-Data:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       # Check out codebase
@@ -29,13 +29,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.11
 
       # Install Poetry
       - name: Install Poetry
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install poetry==1.7.1
 
       # Install project dependencies via Poetry
       - name: Install dependencies
