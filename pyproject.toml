@@ -29,8 +29,9 @@ pyodbc = "^5.2.0"
 greenlet = "^3.0.3"
 folium = "^0.18.0"
 polyline = "^2.0.2"
+azure-storage-blob = "^12.19.0"
 
 [tool.poetry.extras]
-backend = ["selenium"]
+backend = ["selenium", "pandas"]
 frontend = ["streamlit", "Authlib", "pandas", "plotly", "streamlit-components"]
 testing = ["behave", "pytest", "pytest-cov"]
