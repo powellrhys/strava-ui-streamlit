@@ -1,0 +1,51 @@
+{
+  "review": {
+    "enabled": true,
+    "mode": "lightweight",
+    "maxFiles": 5,
+    "maxFileSizeKB": 150,
+
+    "include": [
+      "frontend/**/*.py",
+      "backend/**/*.py",
+      "**/*.py"
+    ],
+    "exclude": [
+      "tests/**",
+      "docs/**",
+      "venv/**",
+      ".venv/**",
+      "build/**",
+      "dist/**",
+      "**/__pycache__/**"
+    ],
+    "reviewDepth": "critical",
+    "commentsPerFile": 1,
+    "ignorePatterns": [
+      "print(",
+      "logging.debug("
+    ]
+  },
+  "linting": {
+    "enabled": true,
+    "autoFix": false,
+    "rules": ["error"]
+  },
+  "AI": {
+    "contextSize": "tiny",
+    "summarizeOnly": true,
+    "focusOn": [
+      "exceptions",
+      "security",
+      "sql-injection",
+      "subprocess",
+      "async-await",
+      "type-errors",
+      "performance"
+    ]
+  },
+  "notifications": {
+    "email": false,
+    "github": true
+  }
+}
