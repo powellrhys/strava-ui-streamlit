@@ -21,7 +21,8 @@ class Variables:
         current_year (int): The current calendar year.
         previous_year (int): The previous calendar year.
         first_activity_date (datetime): The fixed start date for activities (January 1, 2016).
-        current_date (datetime): The end of the current year (December 31).
+        end_of_current_year (datetime): The end of the current year (December 31).
+        current_date (datetime): The current date and time.
         blob_connection_string (str): Azure Blob Storage connection string loaded from secrets.
     """
     def __init__(self):
@@ -30,7 +31,8 @@ class Variables:
         self.current_year = dt.date.today().year
         self.previous_year = dt.date.today().year - 1
         self.first_activity_date = dt.datetime(2016, 1, 1)
-        self.current_date = dt.datetime(dt.datetime.now().year, 12, 31)
+        self.current_date = dt.datetime.now()
+        self.end_of_current_year = dt.datetime(dt.datetime.now().year, 12, 31)
 
         # Collect environmental variables
         self.blob_connection_string = st.secrets['general']['blob_connection_string']

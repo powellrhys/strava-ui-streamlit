@@ -89,8 +89,8 @@ def render_activity_overview(
         date_range = st.slider(
             label="Select a range of dates:",
             min_value=vars.first_activity_date,
-            max_value=vars.current_date,
-            value=(vars.first_activity_date, vars.current_date),
+            max_value=vars.end_of_current_year,
+            value=(vars.first_activity_date, vars.end_of_current_year),
             format="MM/YYYY"
         )
 
