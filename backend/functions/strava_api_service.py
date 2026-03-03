@@ -1,4 +1,7 @@
+# Impoert dependencies and modules
 from azure.storage.blob import BlobServiceClient, ContentSettings
+from .utils import downsample_mean
+from .variables import Variables
 from dotenv import load_dotenv
 from typing import Optional
 from io import StringIO
@@ -6,34 +9,8 @@ import pandas as pd
 import requests
 import logging
 import json
-import os
 
 load_dotenv()
-
-class Variables:
-    """
-    A container class for storing application-wide constants and configuration variables.
-
-    This class loads necessary values such as API credentials and storage connection strings
-    from environment variables during initialization.
-
-    Attributes:
-        client_id (str): The Strava client ID, loaded from the 'client_id' environment variable.
-        client_secret (str): The Strava client secret, loaded from the 'client_secret' environment variable.
-        refresh_token (str): The OAuth refresh token, loaded from the 'refresh_token' environment variable.
-        storage_account_connection_string (str): Azure Blob Storage connection string,
-            loaded from the 'blob_connection_string' environment variable.
-    """
-    def __init__(self):
-
-        # API related variables
-        self.client_id = os.getenv('client_id')
-        self.client_secret = os.getenv('client_secret')
-        self.refresh_token = os.getenv('refresh_token')
-
-        # Storage account variables
-        self.storage_account_conneciton_string = os.getenv('blob_connection_string')
-
 
 class ApiService:
     """
@@ -517,31 +494,3 @@ class ApiService:
         ).json()
 
         return data["map"]["polyline"]
-
-def downsample_mean(rows, factor):
-    """
-    Downsample a list of dict-like rows by averaging values over fixed-size chunks.
-
-    Args:
-        rows (list[dict]): Sequence of rows with identical numeric keys.
-        factor (int): Number of consecutive rows to average into one.
-
-    Returns:
-        list[dict]: Downsampled rows where each value is the mean over a chunk.
-    """
-    # Assume all rows share the same keys
-    keys = rows[0].keys()
-    result = []
-
-    # Process rows in chunks of size `factor`
-    for i in range(0, len(rows), factor):
-        chunk = rows[i:i + factor]
-
-        # Compute mean for each key within the chunk
-        averaged = {
-            k: sum(row[k] for row in chunk) / len(chunk)
-            for k in keys
-        }
-        result.append(averaged)
-
-    return result
