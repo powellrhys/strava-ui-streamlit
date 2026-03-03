@@ -1,5 +1,5 @@
 # Import dependencies
-from backend.functions.data_functions import ApiService, Variables
+from backend.functions import ApiService, Variables, MountainService
 import warnings
 import logging
 
@@ -17,8 +17,13 @@ logger.addHandler(log_handler)
 # Collect codebase variables
 vars = Variables()
 
+logger.info("Configuring Mountain Service application...")
+mountain_app = MountainService(logger=logger)
+mountain_app.run()
+logger.info("Mountain Service workflow completed \n")
+
 # Configure API service class
-logger.info("Configuring API service application...")
+logger.info("Configuring Strav API service application...")
 app = ApiService(
     client_id=vars.client_id,
     client_secret=vars.client_secret,
