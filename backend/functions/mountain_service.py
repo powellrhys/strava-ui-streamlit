@@ -59,7 +59,7 @@ class MountainService:
         columns_to_keep = ["Name", "Metres", "Feet", "Country", "County", "Latitude", "Longitude"]
         df = df[columns_to_keep]
 
-        # Apply filters: Only include mountains over 100 meters 
+        # Apply filters: Only include mountains over 100 meters
         if "Metres" in df.columns:
             df = df[df["Metres"] > 100]
 
@@ -68,7 +68,7 @@ class MountainService:
             df = df[df["Country"] == "W"]
 
         return df.sort_values(by="Metres", ascending=False)
-    
+
     def export_data_as_csv(self, df: pd.DataFrame, vars: Variables, container: str, output_filename: str) -> None:
         """
         Exports the transformed DataFrame as a CSV file to Azure Blob Storage.
@@ -109,7 +109,8 @@ class MountainService:
             self.logger.info(f"After filtering: {len(df)} rows")
 
             # Export the transformed DataFrame as a CSV file to Azure Blob Storage
-            self.export_data_as_csv(df=df, vars=Variables(), container='strava', output_filename='welsh_mountain_data.csv')
+            self.export_data_as_csv(df=df, vars=Variables(), container='strava',
+                                    output_filename='welsh_mountain_data.csv')
 
         except requests.RequestException as e:
             self.logger.error(f"Request failed: {e}")
