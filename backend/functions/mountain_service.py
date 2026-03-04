@@ -71,7 +71,7 @@ class MountainService:
             df = df[df["Country"] == "W"]
 
         return df.sort_values(by="Metres", ascending=False)
-    
+
     def export_data_as_csv(self, df: pd.DataFrame, vars: Variables, container: str, output_filename: str) -> None:
         """
         Exports the transformed DataFrame as a CSV file to Azure Blob Storage.
@@ -114,7 +114,7 @@ class MountainService:
             # Export the transformed DataFrame as a CSV file to Azure Blob Storage
             self.export_data_as_csv(df=df, vars=Variables(), container='strava',
                                     output_filename='welsh_mountain_data.csv')
-            
+
             return df
 
         except requests.RequestException as e:
@@ -135,7 +135,7 @@ class MountainService:
         # Create a geodataframe for routes and peaks
         gdf_routes = gpd.GeoDataFrame(routes_df, geometry="geometry", crs="EPSG:4326")
         gdf_peaks = gpd.GeoDataFrame(
-            peaks_df, 
+            peaks_df,
             geometry=gpd.points_from_xy(peaks_df.Latitude, peaks_df.Longitude),
             crs="EPSG:4326"
         )
