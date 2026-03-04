@@ -400,7 +400,7 @@ class ApiService:
         # Upload CSV to Azure Blob Storage
         blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
 
-    def export_activity_data(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
+    def export_activity_data(self, data: list, vars: Variables, container: str, output_filename: str) -> pd.DataFrame:
         """
         Exports activity data to a CSV file and uploads it to Azure Blob Storage.
 
@@ -434,6 +434,8 @@ class ApiService:
         df['map'] = df['map'].apply(lambda x: x['summary_polyline'])
 
         self.export_data_as_csv(df=df, vars=vars, container=container, output_filename=output_filename)
+
+        return df
 
     def collect_wcp_segments(
         self,

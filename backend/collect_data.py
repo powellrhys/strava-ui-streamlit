@@ -17,11 +17,6 @@ logger.addHandler(log_handler)
 # Collect codebase variables
 vars = Variables()
 
-logger.info("Configuring Mountain Service application...")
-mountain_app = MountainService(logger=logger)
-mountain_app.run()
-logger.info("Mountain Service workflow completed \n")
-
 # Configure API service class
 logger.info("Configuring Strav API service application...")
 app = ApiService(
@@ -63,10 +58,10 @@ logger.info("Coastal path data filtered out \n")
 
 # Export activity data to blob storage
 logger.info("Exporting activity data...")
-app.export_activity_data(data=activity_data,
-                         vars=vars,
-                         container='strava',
-                         output_filename='activity_data.csv')
+activity_df = app.export_activity_data(data=activity_data,
+                                       vars=vars,
+                                       container='strava',
+                                       output_filename='activity_data.csv')
 logger.info("Data exported to blob storage \n")
 
 # Export coastal path data to blob storage
@@ -82,3 +77,12 @@ logger.info("Collecting coastal path segment data...")
 wcp_segments_df = app.collect_wcp_segments()
 app.export_data_as_csv(df=wcp_segments_df, vars=vars, container="strava", output_filename="wcp_segments.csv")
 logger.info("Coastal Path segment data collected \n")
+
+logger.info("Configuring Mountain Service application...")
+mountain_app = MountainService(logger=logger)
+peaks_df = mountain_app.collect_mountain_data()
+logger.info("Mountain Service workflow completed \n")
+
+logger.info("Identifying which peaks have been climbed based on the provided peaks and routes dataframes...")
+mountain_app.identify_climbed_peaks(peaks_df=peaks_df, routes_df=activity_df)
+logger.info("Climbed peaks identified and exported \n")
