@@ -18,6 +18,7 @@ def get_navigation() -> st.navigation:
         "HeatMap": [
             st.Page("pages/heatmap.py", title="Strava Heatmap", icon="🌎"),
             st.Page("pages/coastal_path.py", title='Coastal Path', icon="🌊"),
+            st.Page("pages/mountains.py", title='Mountains', icon="⛰️"),
         ],
         "Running": [
             st.Page("pages/pb_efforts.py", title="PB Efforts Overview", icon="🏆")
