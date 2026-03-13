@@ -335,3 +335,53 @@ def seconds_to_mmss(seconds):
     minutes = int(seconds // 60)
     sec = int(seconds % 60)
     return f"{minutes:02d}:{sec:02d}"
+
+@st.cache_data
+def load_and_cache_data(blob_connection_string: str, container_name :str, blob_name: str) -> pd.DataFrame:
+    """
+    Load data from Azure Blob Storage and return as a DataFrame.
+    """
+    welsh_peaks_df = StravaData(blob_connection_string=blob_connection_string,
+                                container_name=container_name,
+                                blob_name=blob_name)
+
+    return welsh_peaks_df.return_dataframe()
+
+@st.cache_data
+def build_mountain_map(df_json: dict, min_height: int, counties: list) -> folium.Map:
+    """
+    Build a folium map of Welsh mountains based on the provided data and filters.
+    """
+    # Load data and apply filters
+    df = pd.read_json(df_json)
+    df = df[df["Feet"] >= min_height]
+
+    # Filter by county if any are selected
+    if counties:
+        df = df[df["County"].isin(counties)]
+
+    if df.empty:
+        return None
+
+    # Create map centered on the average location of the mountains
+    m = folium.Map(location=[df["Latitude"].mean(), df["Longitude"].mean()])
+    m.fit_bounds([[df["Latitude"].min(), df["Longitude"].min()], [df["Latitude"].max(), df["Longitude"].max()]])
+    Fullscreen().add_to(m)
+
+    # Add markers for each mountain
+    for _, row in df.iterrows():
+        color = "green" if row["climbed"] == True else "red"
+        folium.Marker(
+            location=[row["Latitude"], row["Longitude"]],
+            popup=folium.Popup(
+                f"<b>{row['Name']}</b><br>"
+                f"Height: {row['Metres']}m / {row['Feet']}ft<br>"
+                f"County: {row['County']}<br>"
+                f"Climbed: {'✅' if row['climbed'] else '❌'}",
+                max_width=200,
+            ),
+            tooltip=row["Name"],
+            icon=folium.Icon(color=color, icon="mountain", prefix="fa"),
+        ).add_to(m)
+
+    return m
