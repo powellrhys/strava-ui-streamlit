@@ -34,7 +34,8 @@ class TestGetNavigation(unittest.TestCase):
 
             # HeatMap
             (("pages/heatmap.py",), {"title": "Strava Heatmap", "icon": "🌎"}),
-            (("pages/coastal_path.py",), {"title": "Coastal Path", "icon": "🌊"}),
+            (("pages/coastal_path.py",), {"title": "Welsh Coastal Path", "icon": "🌊"}),
+            (("pages/mountains.py",), {"title": "Welsh Mountain Climbing", "icon": "⛰️"}),
 
             # Running
             (("pages/pb_efforts.py",), {"title": "PB Efforts Overview", "icon": "🏆"}),
@@ -59,7 +60,8 @@ class TestGetNavigation(unittest.TestCase):
             ],
             "HeatMap": [
                 {"args": ("pages/heatmap.py",), "kwargs": {"title": "Strava Heatmap", "icon": "🌎"}},
-                {"args": ("pages/coastal_path.py",), "kwargs": {"title": "Coastal Path", "icon": "🌊"}},
+                {"args": ("pages/coastal_path.py",), "kwargs": {"title": "Welsh Coastal Path", "icon": "🌊"}},
+                {"args": ("pages/mountains.py",), "kwargs": {"title": "Welsh Mountain Climbing", "icon": "⛰️"}},
             ],
             "Running": [
                 {"args": ("pages/pb_efforts.py",), "kwargs": {"title": "PB Efforts Overview", "icon": "🏆"}},
