@@ -31,6 +31,7 @@ folium = "^0.18.0"
 polyline = "^2.0.2"
 azure-storage-blob = "^12.19.0"
 geopandas = "^1.1.2"
+streamlit-folium = "^0.26.2"
 
 [tool.poetry.extras]
 backend = ["selenium", "pandas"]
