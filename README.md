@@ -94,6 +94,10 @@ Due to the sensitive nature of the data, both applications are secured behind au
 
 ![Screenshot of Coastal Path Page](docs/assets/coastal_path_page.png?raw=true "Coastal Path Page")
 
+### Mountain Climbing Page
+
+![Screenshot of Mountain Climing Page](docs/assets/mountain_page.png?raw=true "Mountain Climbing Page")
+
 ### PB Effort Overview Page
 
 ![Screenshot of PB Effort Overview Page](docs/assets/pb_effort_overview_page.png?raw=true "PB Effort Overview Page")
