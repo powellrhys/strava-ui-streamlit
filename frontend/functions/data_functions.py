@@ -337,10 +337,11 @@ def seconds_to_mmss(seconds):
     return f"{minutes:02d}:{sec:02d}"
 
 @st.cache_data
-def load_and_cache_data(blob_connection_string: str, container_name :str, blob_name: str) -> pd.DataFrame:
+def load_and_cache_data(blob_connection_string: str, container_name: str, blob_name: str) -> pd.DataFrame:
     """
     Load data from Azure Blob Storage and return as a DataFrame.
     """
+    # Download welsh peak data from blob storage account
     welsh_peaks_df = StravaData(blob_connection_string=blob_connection_string,
                                 container_name=container_name,
                                 blob_name=blob_name)
@@ -370,7 +371,7 @@ def build_mountain_map(df_json: dict, min_height: int, counties: list) -> folium
 
     # Add markers for each mountain
     for _, row in df.iterrows():
-        color = "green" if row["climbed"] == True else "red"
+        color = "green" if row["climbed"] is True else "red"
         folium.Marker(
             location=[row["Latitude"], row["Longitude"]],
             popup=folium.Popup(

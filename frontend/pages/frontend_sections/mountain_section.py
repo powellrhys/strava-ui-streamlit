@@ -5,6 +5,8 @@ import streamlit as st
 
 def render_mountain_section(vars: Variables) -> None:
     """
+    Renders the mountain section of the application, which includes a map
+    of welsh peaks climbed based on user-selected filters.
     """
     # Render page title
     st.title("Welsh Peaks Climbing Overview")
