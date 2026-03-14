@@ -1,12 +1,12 @@
 # Import dependencies
 from streamlit_components.plot_functions import PlotlyPlotter
-from functions.data_functions import StravaData, Variables
 from dateutil.relativedelta import relativedelta
+from functions.data_functions import StravaData
 import streamlit as st
 import datetime as dt
 import pandas as pd
 
-def render_running_pb_section(data: StravaData) -> None:
+def render_triathlon_training_section(data: StravaData) -> None:
     """
     Function to render triathlon progress dashboard component
     """
