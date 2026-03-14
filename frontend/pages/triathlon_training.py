@@ -1,5 +1,5 @@
 # Import dependencies
-from pages.frontend_sections.triathlon import render_running_pb_section
+from pages.frontend_sections.triathlon import render_triathlon_training_section
 from streamlit_components.ui_components import configure_page_config
 from functions.data_functions import StravaData, Variables
 
@@ -29,4 +29,4 @@ if st.user.is_logged_in:
                                   blob_name='activity_data.csv')
 
     # Render triathlon training dashboard
-    render_running_pb_section(data=activity_data_df, vars=vars)
+    render_triathlon_training_section(data=activity_data_df)

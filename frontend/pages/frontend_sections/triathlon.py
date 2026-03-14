@@ -3,9 +3,10 @@ from streamlit_components.plot_functions import PlotlyPlotter
 from functions.data_functions import StravaData, Variables
 from dateutil.relativedelta import relativedelta
 import streamlit as st
+import datetime as dt
 import pandas as pd
 
-def render_running_pb_section(data: StravaData, vars: Variables) -> None:
+def render_running_pb_section(data: StravaData) -> None:
     """
     Function to render triathlon progress dashboard component
     """
@@ -18,13 +19,24 @@ def render_running_pb_section(data: StravaData, vars: Variables) -> None:
     # Define input widget columns
     columns = st.columns([1, 3, 1])
 
+    # Declare session state variables for date range slider
+    if "triathlon_slider_min" not in st.session_state:
+        st.session_state["triathlon_slider_min"] = dt.date.today() - relativedelta(months=24)
+    if "triathlon_slider_max" not in st.session_state:
+        st.session_state["triathlon_slider_max"] = dt.date.today()
+    if "triathlon_date_range_slider" not in st.session_state:
+        st.session_state["triathlon_date_range_slider"] = (
+            dt.date.today() - relativedelta(months=6),
+            dt.date.today()
+        )
+
     # Render date range slide bar in first column
     with columns[0]:
         date_range = st.slider(
             label="Select a range of dates:",
-            min_value=vars.current_date - relativedelta(months=24),
-            max_value=vars.current_date,
-            value=(vars.current_date - relativedelta(months=6), vars.current_date),
+            min_value=st.session_state["triathlon_slider_min"],
+            max_value=st.session_state["triathlon_slider_max"],
+            value=st.session_state["triathlon_date_range_slider"],
             format="MM/YYYY"
         )
 
