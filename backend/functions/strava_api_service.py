@@ -222,17 +222,18 @@ class ApiService:
         return pd.DataFrame(pb_effort_data)
 
     def collect_activity_stream_data(
-            self,
-            activity_data: list,
-            vars: Variables,
-            access_token: Optional[str] = None
+        self,
+        activity_data: list,
+        vars: Variables,
+        access_token: Optional[str] = None
     ) -> pd.DataFrame:
         """
         Collect activity stream data for PB efforts and export splits as JSON to blob storage.
 
-        Fetches distance, heartrate, and time streams from Strava for activities tagged with
-        [5km], [10km], or [HM]. Computes 1km splits with timing and average heart rate,
-        then exports each activity's splits as JSON to Azure Blob Storage.
+        Fetches distance, heartrate, time, and coordinate streams from Strava for activities 
+        tagged with [5km], [10km], or [HM]. Computes 1km splits with timing and average heart 
+        rate, then exports each activity's splits, downsampled raw data, and full resolution 
+        coordinate data as JSON to Azure Blob Storage.
 
         Parameters
         ----------
@@ -250,7 +251,7 @@ class ApiService:
         """
         # Collect pb effort activity ids
         pb_efforts_ids = [k['id'] for k in activity_data
-                          if any(dist in k['name'] for dist in ['[5km]', '[10km]', '[HM]'])]
+                        if any(dist in k['name'] for dist in ['[5km]', '[10km]', '[HM]'])]
 
         # Manage access token
         if access_token is None:
@@ -263,11 +264,11 @@ class ApiService:
         for activity_id in pb_efforts_ids:
             # Define activity url
             activities_url = f"https://www.strava.com/api/v3/activities/{activity_id}/" + \
-                "streams?keys=time,velocity_smooth,distance,heartrate"
+                "streams?keys=time,velocity_smooth,distance,heartrate,latlng"
 
             # Define request parameters
             params = {
-                "keys": "distance,heartrate,time",
+                "keys": "distance,heartrate,time,latlng",
                 "key_by_type": "true"
             }
 
@@ -278,16 +279,32 @@ class ApiService:
                 params=params
             ).json()
 
-            # Fetch distance, HR and time data from request response
+            # Fetch distance, HR, time and coordinate data from request response
             distance = data.get("distance", {}).get("data", [])
             heartrate = data.get("heartrate", {}).get("data", [])
             time = data.get("time", {}).get("data", [])
+            latlng = data.get("latlng", {}).get("data", [])
 
             # Remap raw data to fit structure generated for split data
             remapped_data = [
                 {key: value["data"][i] for key, value in data.items()}
                 for i in range(len(next(iter(data.values()))["data"]))
             ]
+
+            # Extract raw coordinates before downsampling
+            raw_coords = [
+                {
+                    "time": entry["time"],
+                    "lat": entry["latlng"][0],
+                    "lng": entry["latlng"][1]
+                }
+                for entry in remapped_data
+                if "latlng" in entry
+            ]
+
+            # Remove latlng from remapped_data so downsample_mean doesn't choke on it
+            for entry in remapped_data:
+                entry.pop("latlng", None)
 
             # Smooth out raw data
             remapped_data = downsample_mean(remapped_data, factor=round(len(remapped_data) / 50))
@@ -306,7 +323,9 @@ class ApiService:
                         "avg_hr": (
                             sum(heartrate[current_split_start_idx:i]) / len(heartrate[current_split_start_idx:i])
                             if heartrate else None
-                        )
+                        ),
+                        "start_latlng": latlng[current_split_start_idx] if latlng else None,
+                        "end_latlng": latlng[i] if latlng else None,
                     }
                     splits.append(split)
                     current_split_start_idx = i
@@ -315,10 +334,11 @@ class ApiService:
             exported_data = {}
             exported_data["splits"] = splits
             exported_data["raw"] = remapped_data
+            exported_data["coords"] = raw_coords
 
             # Export data to blob
             self.export_data_as_json(data=exported_data, vars=vars, container="strava",
-                                     output_filename=f"stream/{activity_id}.json")
+                                    output_filename=f"stream/{activity_id}.json")
 
     def export_data_as_json(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
         """

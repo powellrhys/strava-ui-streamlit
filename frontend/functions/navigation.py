@@ -21,7 +21,8 @@ def get_navigation() -> st.navigation:
             st.Page("pages/mountains.py", title='Welsh Mountain Climbing', icon="⛰️"),
         ],
         "Running": [
-            st.Page("pages/pb_efforts.py", title="PB Efforts Overview", icon="🏆")
+            st.Page("pages/pb_efforts.py", title="PB Efforts Overview", icon="🏆"),
+            st.Page("pages/race_analysis.py", title="Race Analysis", icon="🏃‍♂️"),
         ],
         "Triathlon": [
             st.Page("pages/triathlon_training.py", title="Training Overview", icon="🚲"),
