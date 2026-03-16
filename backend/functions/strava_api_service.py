@@ -230,9 +230,9 @@ class ApiService:
         """
         Collect activity stream data for PB efforts and export splits as JSON to blob storage.
 
-        Fetches distance, heartrate, time, and coordinate streams from Strava for activities 
-        tagged with [5km], [10km], or [HM]. Computes 1km splits with timing and average heart 
-        rate, then exports each activity's splits, downsampled raw data, and full resolution 
+        Fetches distance, heartrate, time, and coordinate streams from Strava for activities
+        tagged with [5km], [10km], or [HM]. Computes 1km splits with timing and average heart
+        rate, then exports each activity's splits, downsampled raw data, and full resolution
         coordinate data as JSON to Azure Blob Storage.
 
         Parameters
@@ -251,7 +251,7 @@ class ApiService:
         """
         # Collect pb effort activity ids
         pb_efforts_ids = [k['id'] for k in activity_data
-                        if any(dist in k['name'] for dist in ['[5km]', '[10km]', '[HM]'])]
+                          if any(dist in k['name'] for dist in ['[5km]', '[10km]', '[HM]'])]
 
         # Manage access token
         if access_token is None:
@@ -338,7 +338,7 @@ class ApiService:
 
             # Export data to blob
             self.export_data_as_json(data=exported_data, vars=vars, container="strava",
-                                    output_filename=f"stream/{activity_id}.json")
+                                     output_filename=f"stream/{activity_id}.json")
 
     def export_data_as_json(self, data: list, vars: Variables, container: str, output_filename: str) -> None:
         """
