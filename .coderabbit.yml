@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+reviews:
+  high_level_summary: true
+  changed_files_summary: false
+  review_status: true        
+  auto_review:
+    enabled: true
+    drafts: false
+  request_changes_workflow: false
+
+  path_instructions:
+    - path: "**/*"
+      instructions: "Do not leave inline review comments on code. Only provide the high-level PR summary."
