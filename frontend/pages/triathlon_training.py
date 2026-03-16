@@ -2,7 +2,6 @@
 from pages.frontend_sections.triathlon import render_triathlon_training_section
 from streamlit_components.ui_components import configure_page_config
 from functions.data_functions import StravaData, Variables
-
 from functions.ui_components import render_page_logo
 import streamlit as st
 

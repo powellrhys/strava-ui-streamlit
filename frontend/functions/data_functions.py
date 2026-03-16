@@ -1,6 +1,7 @@
 # Import python dependencies
 from streamlit_components.data_functions import BlobData
 from azure.storage.blob import BlobServiceClient
+from folium.plugins import TimestampedGeoJson
 from folium.plugins import Fullscreen
 from typing import Tuple
 import streamlit as st
@@ -386,3 +387,152 @@ def build_mountain_map(df_json: dict, min_height: int, counties: list) -> folium
         ).add_to(m)
 
     return m
+
+
+def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
+    """
+    """
+
+    COLOURS = [
+        "#00FFFF",
+        "#FF69B4",
+        "#DA70D6",
+        "#FF8C00",
+    ]
+
+    all_coords = []
+    route_datasets = []
+
+    for id in ids:
+
+        # Read activity stream from blob
+        data = read_json_from_blob(vars=vars,
+                                    container_name="strava",
+                                    blob_name=f"stream/{id}.json")
+
+        coords = data.get("coords", [])
+        if not coords:
+            print(f"Warning: No coordinate data found in {id}, skipping.")
+            continue
+
+        all_coords.extend(coords)
+        route_datasets.append({
+            "coords": coords,
+            "name": id
+        })
+
+    if not route_datasets:
+        raise ValueError("No valid coordinate data found in any JSON file.")
+
+    avg_lat = sum(c["lat"] for c in all_coords) / len(all_coords)
+    avg_lng = sum(c["lng"] for c in all_coords) / len(all_coords)
+
+    m = folium.Map(
+        location=[avg_lat, avg_lng],
+        zoom_start=15,
+        tiles="CartoDB dark_matter"
+    )
+
+    def seconds_to_timestamp(seconds: int) -> str:
+        h = seconds // 3600
+        mins = (seconds % 3600) // 60
+        s = seconds % 60
+        return f"2024-01-01T{h:02d}:{mins:02d}:{s:02d}"
+
+    # Merge all routes into a single FeatureCollection
+    all_features = []
+
+    for idx, route in enumerate(route_datasets):
+        coords = route["coords"]
+        colour = COLOURS[idx % len(COLOURS)]
+
+        step = 5
+        coords_thinned = coords[::step]
+
+        for c in coords_thinned:
+            all_features.append({
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [c["lng"], c["lat"]]
+                },
+                "properties": {
+                    "time": seconds_to_timestamp(c["time"]),
+                    "icon": "circle",
+                    "iconstyle": {
+                        "fillColor": colour,
+                        "fillOpacity": 0.9,
+                        "stroke": True,
+                        "color": "#FFFFFF",
+                        "weight": 2,
+                        "radius": 8
+                    }
+                }
+            })
+
+    TimestampedGeoJson(
+        data={"type": "FeatureCollection", "features": all_features},
+        period="PT5S",
+        duration="PT5S",
+        auto_play=False,
+        loop=False,
+        max_speed=50,
+        min_speed=50,
+        speed_slider=False,
+        transition_time=20,
+        loop_button=True,
+        date_options="HH:mm:ss",
+        time_slider_drag_update=True,
+        add_last_point=False
+    ).add_to(m)
+
+    # Build legend HTML
+    legend_items = "".join([
+        f"""
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <div style="
+                width: 14px; height: 14px; border-radius: 50%;
+                background-color: {COLOURS[i % len(COLOURS)]};
+                border: 2px solid #FFFFFF;
+                margin-right: 10px; flex-shrink: 0;">
+            </div>
+            <span style="font-size: 13px; color: #FFFFFF;">{route["name"]}</span>
+        </div>
+        """
+        for i, route in enumerate(route_datasets)
+    ])
+
+    legend_html = f"""
+    <div style="
+        position: fixed;
+        bottom: 80px;
+        left: 15px;
+        z-index: 1000;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 14px 18px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-family: monospace;
+        backdrop-filter: blur(4px);
+    ">
+        <div style="font-size: 12px; color: rgba(255,255,255,0.5);
+                    text-transform: uppercase; letter-spacing: 1px;
+                    margin-bottom: 10px;">Activities</div>
+        {legend_items}
+    </div>
+    """
+
+    m.get_root().html.add_child(folium.Element(legend_html))
+
+        # Add full screen functionality to folium object
+    Fullscreen(position="topleft").add_to(m)
+
+    # Convert to html format
+    map_html = m._repr_html_()
+
+    # Update buffer variable with folium object
+    st.session_state.animation_buffer.write(map_html.encode())
+    st.session_state.animation_buffer.seek(0)
+
+    # Make download available
+    st.session_state.download_animation_disabled = False
