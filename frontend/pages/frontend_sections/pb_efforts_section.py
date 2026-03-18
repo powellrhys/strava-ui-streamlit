@@ -103,8 +103,8 @@ def render_running_pb_section(data: StravaData, vars: Variables) -> None:
 
                     # Read activity stream from blob
                     data = read_json_from_blob(vars=vars,
-                                            container_name="strava",
-                                            blob_name=f"stream/{activity_id}.json")
+                                               container_name="strava",
+                                               blob_name=f"stream/{activity_id}.json")
 
                     # Fetch data of interest and write to a dataframe + append activity name column
                     single_effort_df = pd.DataFrame(data[plot_metric.lower()])
@@ -201,22 +201,20 @@ def render_running_pb_section(data: StravaData, vars: Variables) -> None:
 
     with st.container(border=True):
 
-        races = st.multiselect(label="Animate Race Effort(s)",
-                        options=df['name'].tolist())
-        
+        races = st.multiselect(label="Animate Race Effort(s)", options=df['name'].tolist())
+
         ids = df[df["name"].isin(races)]["id"].tolist()
-        
+
         # Render Generate Heatmap Button
         generate = st.button("Generate Animation")
-        
+
         # Render Download Heatmap Button
         st.download_button(
-                label="Download Animation",
-                data=st.session_state.animation_buffer,
-                file_name='animation.html',
-                mime="text/html",
-                disabled=st.session_state.download_animation_disabled
-            )
+            label="Download Animation",
+            data=st.session_state.animation_buffer,
+            file_name='animation.html',
+            mime="text/html",
+            disabled=st.session_state.download_animation_disabled)
 
         # Render success component if download is possible
         if not st.session_state.download_animation_disabled:

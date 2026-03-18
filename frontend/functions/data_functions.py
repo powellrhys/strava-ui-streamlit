@@ -407,8 +407,8 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
 
         # Read activity stream from blob
         data = read_json_from_blob(vars=vars,
-                                    container_name="strava",
-                                    blob_name=f"stream/{id}.json")
+                                   container_name="strava",
+                                   blob_name=f"stream/{id}.json")
 
         coords = data.get("coords", [])
         if not coords:
@@ -524,7 +524,7 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
 
     m.get_root().html.add_child(folium.Element(legend_html))
 
-        # Add full screen functionality to folium object
+    # Add full screen functionality to folium object
     Fullscreen(position="topleft").add_to(m)
 
     # Convert to html format
