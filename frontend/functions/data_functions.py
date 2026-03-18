@@ -545,7 +545,7 @@ def create_route_animation(race_ids_dict: list[str], vars: Variables) -> folium.
     m.get_root().html.add_child(folium.Element("""
         <style>
             .leaflet-bottom.leaflet-left {
-                bottom: unset !important; 
+                bottom: unset !important;
                 top: 0 !important;
                 left: 60px !important;
             }
