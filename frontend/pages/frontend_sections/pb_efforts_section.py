@@ -1,5 +1,5 @@
 # Import dependencies
-from functions.data_functions import StravaData, Variables, read_json_from_blob, seconds_to_mmss
+from functions.data_functions import StravaData, Variables, read_json_from_blob, seconds_to_mmss, create_route_animation
 from streamlit_components.plot_functions import PlotlyPlotter
 import streamlit as st
 import pandas as pd
@@ -27,6 +27,7 @@ def render_running_pb_section(data: StravaData, vars: Variables) -> None:
 
     # Render plot of pb efforts over time
     if len(df) > 0:
+
         # Define columns to store user inputs
         columns = st.columns([3, 2])
 
@@ -74,124 +75,160 @@ def render_running_pb_section(data: StravaData, vars: Variables) -> None:
         # Collect activity names for specific distance
         efforts = df[df['name'].str.contains(distance_map[distance], na=False)]["name"]
 
-        # Define 3 column objects
-        columns = st.columns([6, 1, 1])
+        with st.container(border=True):
 
-        # Render multiselect object within first column
-        with columns[0]:
-            activities = st.multiselect(label="Activities To Analysis", options=efforts)
+            # Define 3 column objects
+            columns = st.columns([6, 1, 1])
 
-        # Render plot metric pills within final column
-        with columns[-1]:
-            plot_metric = st.pills(label="Plot Breakdown", options=["Splits", "Raw"], default="Splits")
+            # Render multiselect object within first column
+            with columns[0]:
+                activities = st.multiselect(label="Activities To Analysis", options=efforts)
 
-        # Filter effort data by selected activities
-        effort_df = df[df["name"].isin(activities)]
+            # Render plot metric pills within final column
+            with columns[-1]:
+                plot_metric = st.pills(label="Plot Breakdown", options=["Splits", "Raw"], default="Splits")
 
-        # If activities have been selected, render the following section
-        if len(effort_df) > 0:
+            # Filter effort data by selected activities
+            effort_df = df[df["name"].isin(activities)]
 
-            # Create activity name and index dictionary to collect data from blob
-            activities = effort_df.set_index("name")["id"].to_dict()
+            # If activities have been selected, render the following section
+            if len(effort_df) > 0:
 
-            # Define empty dataframe and iterate through selected activities
-            all_effort_df = pd.DataFrame()
-            for activity_name, activity_id in activities.items():
+                # Create activity name and index dictionary to collect data from blob
+                activities = effort_df.set_index("name")["id"].to_dict()
 
-                # Read activity stream from blob
-                data = read_json_from_blob(vars=vars,
-                                           container_name="strava",
-                                           blob_name=f"stream/{activity_id}.json")
+                # Define empty dataframe and iterate through selected activities
+                all_effort_df = pd.DataFrame()
+                for activity_name, activity_id in activities.items():
 
-                # Fetch data of interest and write to a dataframe + append activity name column
-                single_effort_df = pd.DataFrame(data[plot_metric.lower()])
-                single_effort_df["Activity Name"] = activity_name
+                    # Read activity stream from blob
+                    data = read_json_from_blob(vars=vars,
+                                               container_name="strava",
+                                               blob_name=f"stream/{activity_id}.json")
 
-                # Concat activity data to all effort dataframe
-                all_effort_df = pd.concat([all_effort_df, single_effort_df], ignore_index=True)
+                    # Fetch data of interest and write to a dataframe + append activity name column
+                    single_effort_df = pd.DataFrame(data[plot_metric.lower()])
+                    single_effort_df["Activity Name"] = activity_name
 
-            # If plot metric is splits, create splits string for plot
-            if plot_metric == "Splits":
-                all_effort_df["split_str"] = (
-                    all_effort_df["split_time"]
-                    .astype(int)
-                    .apply(lambda s: f"{s // 60}:{s % 60:02d}")
-                )
+                    # Concat activity data to all effort dataframe
+                    all_effort_df = pd.concat([all_effort_df, single_effort_df], ignore_index=True)
 
-            # If plot metric is raw, create pace and time columns ready for plot
-            else:
-                # Convert velocity (m/s) to pace in seconds per km
-                all_effort_df['pace_sec'] = 1000 / all_effort_df['velocity_smooth']
-                all_effort_df["distance"] = all_effort_df["distance"] / 1000
+                # If plot metric is splits, create splits string for plot
+                if plot_metric == "Splits":
+                    all_effort_df["split_str"] = (
+                        all_effort_df["split_time"]
+                        .astype(int)
+                        .apply(lambda s: f"{s // 60}:{s % 60:02d}")
+                    )
 
-                # Calculate data point pace
-                all_effort_df['pace'] = all_effort_df['velocity_smooth'].apply(
-                    lambda x: f"{int((1000/x)//60)}:{int(round((1000/x) % 60)):02d}" if x > 0 else "Invalid speed"
-                )
+                # If plot metric is raw, create pace and time columns ready for plot
+                else:
+                    # Convert velocity (m/s) to pace in seconds per km
+                    all_effort_df['pace_sec'] = 1000 / all_effort_df['velocity_smooth']
+                    all_effort_df["distance"] = all_effort_df["distance"] / 1000
 
-            # Define plot config for both plot types
-            plot_dict = {
-                "Splits": {
-                    "x": "split_number",
-                    "y": "split_time",
-                    "hover_data": {"split_str": True, "split_time": False},
-                    "labels": {
-                        "split_number": "Distance (km)",
-                        "split_time": "Split Time (sec)",
-                        "split_str": "Splits (mm:ss/km)"
-                    }
-                },
-                "Raw": {
-                    "x": "distance",
-                    "y": "pace_sec",
-                    "hover_data": {"pace": True, "pace_sec": False, "distance": ":.2f"},
-                    "labels": {
-                        "distance": "Distance (km)",
-                        "pace_sec": "Split Time (sec)",
-                        "pace": "Split (mm:ss/km)"
+                    # Calculate data point pace
+                    all_effort_df['pace'] = all_effort_df['velocity_smooth'].apply(
+                        lambda x: f"{int((1000/x)//60)}:{int(round((1000/x) % 60)):02d}" if x > 0 else "Invalid speed"
+                    )
+
+                # Define plot config for both plot types
+                plot_dict = {
+                    "Splits": {
+                        "x": "split_number",
+                        "y": "split_time",
+                        "hover_data": {"split_str": True, "split_time": False},
+                        "labels": {
+                            "split_number": "Distance (km)",
+                            "split_time": "Split Time (sec)",
+                            "split_str": "Splits (mm:ss/km)"
+                        }
+                    },
+                    "Raw": {
+                        "x": "distance",
+                        "y": "pace_sec",
+                        "hover_data": {"pace": True, "pace_sec": False, "distance": ":.2f"},
+                        "labels": {
+                            "distance": "Distance (km)",
+                            "pace_sec": "Split Time (sec)",
+                            "pace": "Split (mm:ss/km)"
+                        }
                     }
                 }
-            }
 
-            # Generate plot using plot config outlined above
-            fig = PlotlyPlotter(
-                all_effort_df,
-                x=plot_dict[plot_metric]["x"],
-                y=plot_dict[plot_metric]["y"],
-                color="Activity Name",
-                markers=True,
-                title=f"{distance} Pace Breakdown",
-                hover_data=plot_dict[plot_metric]["hover_data"],
-                labels=plot_dict[plot_metric]["labels"],
-            ).plot_line()
+                # Generate plot using plot config outlined above
+                fig = PlotlyPlotter(
+                    all_effort_df,
+                    x=plot_dict[plot_metric]["x"],
+                    y=plot_dict[plot_metric]["y"],
+                    color="Activity Name",
+                    markers=True,
+                    title=f"{distance} Pace Breakdown",
+                    hover_data=plot_dict[plot_metric]["hover_data"],
+                    labels=plot_dict[plot_metric]["labels"],
+                ).plot_line()
 
-            # Define axis mapping config dictionary to handle both plot types
-            axis_mapping = {"Splits": "split_time", "Raw": "pace_sec"}
+                # Define axis mapping config dictionary to handle both plot types
+                axis_mapping = {"Splits": "split_time", "Raw": "pace_sec"}
 
-            # Collect Min and max of splits
-            min_sec = all_effort_df[axis_mapping[plot_metric]].min()
-            max_sec = all_effort_df[axis_mapping[plot_metric]].max()
+                # Collect Min and max of splits
+                min_sec = all_effort_df[axis_mapping[plot_metric]].min()
+                max_sec = all_effort_df[axis_mapping[plot_metric]].max()
 
-            # Generate 6 evenly spaced ticks and values
-            tickvals = np.linspace(min_sec, max_sec, 6)
-            ticktext = [seconds_to_mmss(s) for s in tickvals]
+                # Generate 6 evenly spaced ticks and values
+                tickvals = np.linspace(min_sec, max_sec, 6)
+                ticktext = [seconds_to_mmss(s) for s in tickvals]
 
-            # Update ya
-            fig.update_yaxes(
-                tickvals=tickvals,
-                ticktext=ticktext,
-                autorange="reversed",
-                title_text="Splits (mm:ss/km)"
-            )
+                # Update ya
+                fig.update_yaxes(
+                    tickvals=tickvals,
+                    ticktext=ticktext,
+                    autorange="reversed",
+                    title_text="Splits (mm:ss/km)"
+                )
 
-            # Render plot within container
-            with st.container(border=True):
-                st.plotly_chart(fig)
+                # Render plot within container
+                with st.container(border=True):
+                    st.plotly_chart(fig)
 
-        # Render message on screen if no activities were selected
-        else:
-            st.info("No activities selected for analysis")
+            # Render message on screen if no activities were selected
+            else:
+                st.info("No activities selected for analysis")
 
     # Render message on screen if no records have been recorded for specific distance
     else:
         st.info(f"No effort data recorded for {distance_map[distance]}")
+
+    with st.container(border=True):
+
+        races = st.multiselect(label="Animate Race Effort(s)", options=df['name'].tolist())
+
+        ids = df[df["name"].isin(races)]["id"].tolist()
+
+        race_ids_dict = [{"race": k, "id": v} for k, v in zip(races, ids)]
+
+        # Render Generate Heatmap Button
+        generate = st.button("Generate Animation")
+
+        # Render Download Heatmap Button
+        st.download_button(
+            label="Download Animation",
+            data=st.session_state.animation_buffer,
+            file_name='animation.html',
+            mime="text/html",
+            disabled=st.session_state.download_animation_disabled)
+
+        # Render success component if download is possible
+        if not st.session_state.download_animation_disabled:
+            st.success('Animation Ready for Download')
+
+        # Define logic for when Generate Heatmap button is clicked
+        if generate:
+
+            # Render spinner for when an animation is being created
+            with st.spinner('Generating Animation...'):
+
+                create_route_animation(race_ids_dict=race_ids_dict, vars=vars)
+
+                # Reload page
+                st.rerun()

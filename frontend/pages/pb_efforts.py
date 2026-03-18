@@ -4,6 +4,7 @@ from streamlit_components.ui_components import configure_page_config
 from functions.data_functions import StravaData, Variables
 from functions.ui_components import render_page_logo
 import streamlit as st
+import io
 
 # Set page config
 configure_page_config(repository_name='strava-ui-streamlit',
@@ -15,6 +16,13 @@ vars = Variables()
 # Ensure user is authenticated to use application
 if not st.user.is_logged_in:
     st.login('auth0')
+
+# Configure page initial state
+if 'download_animation_disabled' not in st.session_state:
+    st.session_state.download_animation_disabled = True
+
+if 'animation_buffer' not in st.session_state:
+    st.session_state.animation_buffer = io.BytesIO()
 
 # Render application if user is logged in
 if st.user.is_logged_in:
