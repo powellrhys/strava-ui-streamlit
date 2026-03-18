@@ -28,8 +28,18 @@ class MountainService:
         # Declare the URL for the ZIP file download
         url = "https://www.hill-bagging.co.uk/dobih-downloads/hillcsv.zip"
 
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "Referer": "https://www.hill-bagging.co.uk/",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        }
+
         # Download the zip file stream from the URL
-        response = requests.get(url, stream=True)
+        response = requests.get(url, headers=headers, stream=True)
         response.raise_for_status()
         return response.content
 
