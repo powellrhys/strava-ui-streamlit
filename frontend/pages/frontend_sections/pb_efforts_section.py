@@ -205,6 +205,8 @@ def render_running_pb_section(data: StravaData, vars: Variables) -> None:
 
         ids = df[df["name"].isin(races)]["id"].tolist()
 
+        race_ids_dict = [{"race": k, "id": v} for k, v in zip(races, ids)]
+
         # Render Generate Heatmap Button
         generate = st.button("Generate Animation")
 
@@ -226,7 +228,7 @@ def render_running_pb_section(data: StravaData, vars: Variables) -> None:
             # Render spinner for when an animation is being created
             with st.spinner('Generating Animation...'):
 
-                create_route_animation(ids=ids, vars=vars)
+                create_route_animation(race_ids_dict=race_ids_dict, vars=vars)
 
                 # Reload page
                 st.rerun()

@@ -10,6 +10,7 @@ import pandas as pd
 import polyline
 import folium
 import json
+import io
 
 class Variables:
     """
@@ -399,10 +400,13 @@ def seconds_to_timestamp(seconds: int) -> str:
 
     return f"2024-01-01T{h:02d}:{mins:02d}:{s:02d}"
 
+def create_route_animation(race_ids_dict: list[str], vars: Variables) -> folium.Map:
+    """
+    """
+    # Reset session state before generating new animation
+    st.session_state.animation_buffer = io.BytesIO()
+    st.session_state.download_animation_disabled = True
 
-def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
-    """
-    """
     # Define a list of colours to cycle through for different routes
     COLOURS = [
         "#00FFFF", "#FF69B4", "#DA70D6", "#FF8C00", "#FF1493",
@@ -414,12 +418,12 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
     route_datasets = []
 
     # Iterate through selected activities and collect coordinate data from blob
-    for id in ids:
+    for race_id in race_ids_dict:
 
         # Read activity stream from blob
         data = read_json_from_blob(vars=vars,
                                    container_name="strava",
-                                   blob_name=f"stream/{id}.json")
+                                   blob_name=f"stream/{race_id["id"]}.json")
 
         # Extract coordinates and check if they exist before proceeding
         coords = data.get("coords", [])
@@ -430,7 +434,7 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
         
         # Extend the all_coords list with the coordinates from this activity for later averaging
         all_coords.extend(coords)
-        route_datasets.append({"coords": coords, "name": id})
+        route_datasets.append({"coords": coords, "name": race_id["race"]})
 
     # If no valid coordinate data was found in any of the selected activities, raise an error to inform the user
     if not route_datasets:
@@ -516,8 +520,8 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
     legend_html = f"""
     <div style="
         position: fixed;
-        bottom: 80px;
-        left: 15px;
+        top: 15px;
+        right: 15px;
         z-index: 1000;
         background-color: rgba(0, 0, 0, 0.7);
         padding: 14px 18px;
@@ -536,8 +540,15 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
     # Add the legend HTML to the folium map
     m.get_root().html.add_child(folium.Element(legend_html))
 
-    # Add full screen functionality to folium object
-    Fullscreen(position="topleft").add_to(m)
+    m.get_root().html.add_child(folium.Element("""
+        <style>
+            .leaflet-bottom.leaflet-left { 
+                bottom: unset !important; 
+                top: 0 !important;
+                left: 60px !important;
+            }
+        </style>
+    """))
 
     # Convert to html format
     map_html = m._repr_html_()
