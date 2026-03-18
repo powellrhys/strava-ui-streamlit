@@ -28,6 +28,7 @@ class MountainService:
         # Declare the URL for the ZIP file download
         url = "https://www.hill-bagging.co.uk/dobih-downloads/hillcsv.zip"
 
+        # Define headers to mimic a browser request and avoid potential blocking by the server
         headers = {
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

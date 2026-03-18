@@ -388,21 +388,32 @@ def build_mountain_map(df_json: dict, min_height: int, counties: list) -> folium
 
     return m
 
+def seconds_to_timestamp(seconds: int) -> str:
+    """
+    Convert seconds to a timestamp string in the format
+    """
+    # Assuming the base date is arbitrary since we only care about the time component
+    h = seconds // 3600
+    mins = (seconds % 3600) // 60
+    s = seconds % 60
+
+    return f"2024-01-01T{h:02d}:{mins:02d}:{s:02d}"
+
 
 def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
     """
     """
-
+    # Define a list of colours to cycle through for different routes
     COLOURS = [
-        "#00FFFF",
-        "#FF69B4",
-        "#DA70D6",
-        "#FF8C00",
-    ]
+        "#00FFFF", "#FF69B4", "#DA70D6", "#FF8C00", "#FF1493",
+        "#00FF00", "#FFD700", "#32CD32", "#FF4500", "#1E90FF"
+        ]
 
+    # Collect all coordinates from the selected activities to calculate average location for map centering
     all_coords = []
     route_datasets = []
 
+    # Iterate through selected activities and collect coordinate data from blob
     for id in ids:
 
         # Read activity stream from blob
@@ -410,45 +421,43 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
                                    container_name="strava",
                                    blob_name=f"stream/{id}.json")
 
+        # Extract coordinates and check if they exist before proceeding
         coords = data.get("coords", [])
+
+        # If no coordinates are found, skip this activity and continue with the next one
         if not coords:
-            print(f"Warning: No coordinate data found in {id}, skipping.")
             continue
-
+        
+        # Extend the all_coords list with the coordinates from this activity for later averaging
         all_coords.extend(coords)
-        route_datasets.append({
-            "coords": coords,
-            "name": id
-        })
+        route_datasets.append({"coords": coords, "name": id})
 
+    # If no valid coordinate data was found in any of the selected activities, raise an error to inform the user
     if not route_datasets:
         raise ValueError("No valid coordinate data found in any JSON file.")
 
+    # Calculate average latitude and longitude for map centering using all collected coordinates
     avg_lat = sum(c["lat"] for c in all_coords) / len(all_coords)
     avg_lng = sum(c["lng"] for c in all_coords) / len(all_coords)
 
-    m = folium.Map(
-        location=[avg_lat, avg_lng],
-        zoom_start=15,
-        tiles="CartoDB dark_matter"
-    )
-
-    def seconds_to_timestamp(seconds: int) -> str:
-        h = seconds // 3600
-        mins = (seconds % 3600) // 60
-        s = seconds % 60
-        return f"2024-01-01T{h:02d}:{mins:02d}:{s:02d}"
+    # Construct folium map object centered on the average location of all routes
+    m = folium.Map(location=[avg_lat, avg_lng], zoom_start=15, tiles="CartoDB dark_matter")
 
     # Merge all routes into a single FeatureCollection
     all_features = []
 
+    # Iterate through each route
     for idx, route in enumerate(route_datasets):
+
+        # Extract coordinates and assign a colour based on the route index
         coords = route["coords"]
         colour = COLOURS[idx % len(COLOURS)]
 
+        # Minimize the number of points by taking every nth point (e.g., every 5th point) to improve performance
         step = 5
         coords_thinned = coords[::step]
 
+        # Create a GeoJSON feature for each coordinate point with the appropriate styling and timestamp for animation
         for c in coords_thinned:
             all_features.append({
                 "type": "Feature",
@@ -470,6 +479,7 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
                 }
             })
 
+    # Create a TimestampedGeoJson layer with the collected features and add it to the map
     TimestampedGeoJson(
         data={"type": "FeatureCollection", "features": all_features},
         period="PT5S",
@@ -502,6 +512,7 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
         for i, route in enumerate(route_datasets)
     ])
 
+    # Add legend to the map using a custom HTML element
     legend_html = f"""
     <div style="
         position: fixed;
@@ -522,6 +533,7 @@ def create_route_animation(ids: list[str], vars: Variables) -> folium.Map:
     </div>
     """
 
+    # Add the legend HTML to the folium map
     m.get_root().html.add_child(folium.Element(legend_html))
 
     # Add full screen functionality to folium object
