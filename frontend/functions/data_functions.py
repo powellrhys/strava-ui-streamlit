@@ -402,6 +402,8 @@ def seconds_to_timestamp(seconds: int) -> str:
 
 def create_route_animation(race_ids_dict: list[str], vars: Variables) -> folium.Map:
     """
+    Generate a route animation for the selected race efforts and update
+    Streamlit session state with the animation HTML.
     """
     # Reset session state before generating new animation
     st.session_state.animation_buffer = io.BytesIO()
@@ -423,7 +425,7 @@ def create_route_animation(race_ids_dict: list[str], vars: Variables) -> folium.
         # Read activity stream from blob
         data = read_json_from_blob(vars=vars,
                                    container_name="strava",
-                                   blob_name=f"stream/{race_id["id"]}.json")
+                                   blob_name=f"stream/{race_id['id']}.json")
 
         # Extract coordinates and check if they exist before proceeding
         coords = data.get("coords", [])
