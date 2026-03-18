@@ -413,7 +413,7 @@ def create_route_animation(race_ids_dict: list[str], vars: Variables) -> folium.
     COLOURS = [
         "#00FFFF", "#FF69B4", "#DA70D6", "#FF8C00", "#FF1493",
         "#00FF00", "#FFD700", "#32CD32", "#FF4500", "#1E90FF"
-        ]
+    ]
 
     # Collect all coordinates from the selected activities to calculate average location for map centering
     all_coords = []
@@ -433,7 +433,7 @@ def create_route_animation(race_ids_dict: list[str], vars: Variables) -> folium.
         # If no coordinates are found, skip this activity and continue with the next one
         if not coords:
             continue
-        
+
         # Extend the all_coords list with the coordinates from this activity for later averaging
         all_coords.extend(coords)
         route_datasets.append({"coords": coords, "name": race_id["race"]})
@@ -544,7 +544,7 @@ def create_route_animation(race_ids_dict: list[str], vars: Variables) -> folium.
 
     m.get_root().html.add_child(folium.Element("""
         <style>
-            .leaflet-bottom.leaflet-left { 
+            .leaflet-bottom.leaflet-left {
                 bottom: unset !important; 
                 top: 0 !important;
                 left: 60px !important;
